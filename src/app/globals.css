@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+/* Design tokens from docs/SPEC.md. */
+@theme {
+  --color-background: #faf7ff;
+  --color-surface: #ffffff;
+  --color-ink: #2e1f47;
+  --color-muted: #6a5a85;
+  --color-accent: #7c4dcc;
+  --color-accent-hover: #5b34a3;
+  --color-lilac: #dcc6f5;
+  --color-soft: #f3ecfd;
+  --color-line: #e6daf5;
+  --color-success: #25613a;
+  --color-success-bg: #e3f1e6;
+  --color-warning: #7a4a0b;
+  --color-warning-bg: #fbebd3;
+
+  --font-serif: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
+  --font-script: var(--font-sacramento), cursive;
+
+  --radius-card: 24px;
+  --radius-input: 14px;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-ink);
+}
