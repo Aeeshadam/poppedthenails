@@ -73,7 +73,7 @@ The designs are mobile only. On desktop, centre the same layout in a column abou
 
 ## Data model
 
-Four tables in Supabase Postgres. Money is stored in pence as integers, and times as `timestamptz` in UTC.
+Four tables in Supabase Postgres. Money is stored in whole pounds as integers, and times as `timestamptz` in UTC.
 
 **`services`**
 
@@ -83,11 +83,11 @@ Four tables in Supabase Postgres. Money is stored in pence as integers, and time
 | `name` | text | "BIAB overlay" |
 | `description` | text, nullable | |
 | `duration_min` | int | 15 to 240. Shown to clients; not used to work out slots. |
-| `price_pence` | int | |
-| `deposit_pence` | int, default 500 | |
+| `price_pounds` | int | Whole pounds |
+| `deposit_pounds` | int, default 5 | Whole pounds |
 | `photo_path` | text, nullable | Path in Supabase Storage |
 | `is_active` | boolean, default true | The show or hide switch |
-| `sort_order` | int | Order on the site |
+| `created_at` | timestamptz, default now() | Services are listed in the order they were added |
 
 **`slots`** (each date and time she is free, added by her)
 
@@ -106,7 +106,7 @@ Four tables in Supabase Postgres. Money is stored in pence as integers, and time
 | `reference` | text, unique | Short payment reference, "POP-4827" |
 | `slot_id` | uuid, references slots | The slot this booking takes |
 | `service_id` | uuid, references services | |
-| `service_name`, `price_pence`, `deposit_pence`, `duration_min` | copied from the service | A snapshot, so later price edits don't change old bookings |
+| `service_name`, `price_pounds`, `deposit_pounds`, `duration_min` | copied from the service | A snapshot, so later price edits don't change old bookings |
 | `starts_at` | timestamptz | Copied from the slot |
 | `client_name`, `client_email`, `client_phone` | text | |
 | `notes` | text, nullable | |

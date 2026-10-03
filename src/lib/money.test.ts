@@ -1,18 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { formatPence } from "./money";
+import { formatPounds } from "./money";
 
-describe("formatPence", () => {
-  it("shows whole pounds without pence", () => {
-    expect(formatPence(2500)).toBe("£25");
-    expect(formatPence(500)).toBe("£5");
+describe("formatPounds", () => {
+  it("adds the pound sign", () => {
+    expect(formatPounds(25)).toBe("£25");
+    expect(formatPounds(5)).toBe("£5");
   });
 
-  it("shows pence to two places", () => {
-    expect(formatPence(2550)).toBe("£25.50");
-    expect(formatPence(1205)).toBe("£12.05");
+  it("handles three-figure prices", () => {
+    expect(formatPounds(120)).toBe("£120");
   });
 
   it("handles zero", () => {
-    expect(formatPence(0)).toBe("£0");
+    expect(formatPounds(0)).toBe("£0");
   });
 });

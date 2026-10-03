@@ -32,7 +32,7 @@ Run type check, lint and tests before saying a step is finished.
 
 ## Rules
 
-- Money is stored in pence as integers. Format as pounds only when displaying.
+- Money is stored in whole pounds as integers (`price_pounds`, `deposit_pounds`). Add the £ sign only when displaying.
 - Times are stored in UTC as `timestamptz` and always displayed in `Europe/London`.
 - All writes, and all reads of `slots`, `bookings` and `settings`, happen in server code using the service role key. Never import that key into a client component.
 - The public (anon) key may only read active services.

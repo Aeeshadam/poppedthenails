@@ -65,8 +65,8 @@ Change the home page to read active services and the settings row from Supabase
 instead of hard-coded data.
 
 Build step 1 of booking at /book to match docs/designs/book-service.png: list active
-services in sort order, let the client select one, and continue to
-/book/time?service=<id>. Format prices from pence. Handle the case of no active
+services in the order they were added, let the client select one, and continue to
+/book/time?service=<id>. Format prices in pounds. Handle the case of no active
 services with a friendly message.
 
 Show me your plan first.
@@ -157,7 +157,7 @@ Done when: a test booking sends you the deposit email, and marking it paid sends
 Read CLAUDE.md and docs/SPEC.md.
 
 Build:
-1. /admin/services to match docs/designs/admin-services.png: list, add, edit, reorder,
+1. /admin/services to match docs/designs/admin-services.png: list, add, edit,
    show/hide toggle, and photo upload to the Supabase Storage "photos" bucket.
 2. /admin/availability to match docs/designs/admin-availability.png: a week strip,
    a grid of half-hour times from 08:00 to 21:00 plus a custom time field, tap to add
