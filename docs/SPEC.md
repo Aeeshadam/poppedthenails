@@ -31,7 +31,7 @@ One Next.js app holds the public site, the booking flow and the admin pages. Thr
 | Hosting | Netlify | Builds from GitHub, runs server code as functions, scheduled functions | Free plan: 300 credits a month, 15 per production deploy |
 | Database | Supabase Postgres | Services, slots, bookings, settings | Free tier |
 | Admin login | Supabase Auth, email link | Her sign-in, no password | Free tier |
-| Photos | Supabase Storage | Service and gallery photos | Free tier |
+| Photos | Supabase Storage, and `public/gallery/` for now | Service photos in Storage. Gallery photos are a fixed list in code for now (see open questions). | Free tier |
 | Email | Resend + React Email | All client and admin emails | Free tier, check current limits |
 | Domain | Any registrar | Site address and the email sending address | About £10 a year |
 | Code | GitHub private repo | Source, deploy trigger | Free |
@@ -46,7 +46,8 @@ Three things to know before building:
 
 | Route | Page | Who | Notes |
 | --- | --- | --- | --- |
-| `/` | Home | Public | Hero, services, gallery, about, good to know. Reads services and settings. |
+| `/` | Home | Public | Hero, photo carousel, services, about, good to know, find us. Reads services and settings. |
+| `/gallery` | Gallery | Public | All gallery photos in a grid, a link to Instagram and a book button. Linked from the carousel and the footer. |
 | `/book` | Step 1, choose service | Public | Active services only |
 | `/book/time?service=…` | Step 2, date and time | Public | Shows the days that have open slots, then the times on the chosen day |
 | `/book/details?service=…&slot=…` | Step 3, your details | Public | Name, email, mobile, notes, policy checkbox |
@@ -55,7 +56,8 @@ Three things to know before building:
 | `/admin` | Bookings | Her | Waiting for deposit, today, upcoming. Mark as paid, cancel. |
 | `/admin/services` | Services | Her | Add, edit, show or hide |
 | `/admin/availability` | Availability | Her | Add and remove the dates and times she is free |
-| `/admin/settings` | Settings (no design yet; follow the other admin pages) | Her | Bank details, address, Instagram, deposit wording |
+| `/admin/settings` | Settings (no design yet; follow the other admin pages) | Her | Bank details, address, usual hours, Instagram, about text, deposit wording, hold hours, minimum notice |
+| `/terms` | Terms and conditions | Public | Deposit and cancellation policy, holding a slot, booking notice, on the day. Linked from "Good to know", the footer and the policy checkbox on step 3. |
 | `/privacy` | Privacy notice | Public | Short plain-English page, linked in the footer |
 
 Server endpoints:
@@ -70,6 +72,18 @@ Server endpoints:
 | `/api/cron/sweep` | Netlify scheduled function, every 15 minutes | Expires unpaid bookings and sends day-before reminders |
 
 The designs are mobile only. On desktop, centre the same layout in a column about 480px wide for the booking and admin pages, and widen the home page to two columns.
+
+Home page sections, top to bottom:
+
+- **Header:** logo and a "Book now" button.
+- **Hero:** the hero photo in an arched card, darkened towards the bottom, with "hey gorgeous", "Pretty nails, happy you." and a white "Book your slot" button on top. A one-line intro sits under the card.
+- **Photo carousel:** arched slides of the gallery photos. It moves on by itself every 4 seconds and can be swiped. It pauses while the visitor is touching, hovering over or focused on it, starts again 6 seconds after they stop, and loops back to the start after the last photo. It never moves by itself when the device asks for reduced motion, and a Pause button stops it (WCAG 2.2.2). "Gallery →" links to `/gallery`.
+- **Services:** the first four active services, and "See all services & book".
+- **About** and **Good to know** cards. Good to know links to `/terms`.
+- **Find us:** a drawn map preview (not a live map, so nothing loads from Google), the address on two lines, her usual hours, and "Get directions", which opens Google Maps.
+- **Footer:** logo; links to Gallery, Book now and Terms & conditions; Instagram; copyright and Privacy.
+
+On desktop (768px and wider) the home page sits in a 1024px column. The hero becomes two columns: the headline, intro and a purple "Book your slot" button on the left, and the arched photo on the right. The carousel shows four photos at a time, without the enlarged active slide, and adds previous and next arrow buttons because there is no swipe.
 
 ## Data model
 
@@ -124,7 +138,9 @@ Four tables in Supabase Postgres. Money is stored in whole pounds as integers, a
 | `hold_hours` | int, default 2 | |
 | `min_notice_hours` | int, default 24 | Latest a client can book before a slot |
 | `deposit_policy` | text | The wording shown before booking and in emails |
-| `address`, `instagram_handle`, `about_text` | text | Home page and emails. Dummy values until launch. |
+| `address` | text | Two lines: street, then town and postcode. Home page, confirmed page and emails. Dummy value until launch. |
+| `hours_note` | text | Her usual hours in a sentence, shown under "Find us". Dummy value until launch. |
+| `instagram_handle`, `about_text` | text | Home page and emails. Dummy values until launch. |
 
 One database rule prevents double-booking even if two people submit at the same second. A slot can have only one live booking:
 
@@ -261,14 +277,17 @@ Shape and spacing: buttons and chips are fully rounded pills, 54 to 56px tall. C
 
 ## Build order
 
+Every screen is built first with dummy data, then the database and logic go in behind it.
+
 1. **Project setup.** Next.js, TypeScript, Tailwind with the tokens above, fonts, the logo, and the home page with dummy data.
-2. **Database.** The four tables, the one-booking-per-slot index, security rules, and dummy services and slots.
-3. **Public pages.** Home page and step 1, reading real services from Supabase.
-4. **Booking.** Steps 2 and 3 from open slots, `createBooking`, and the deposit and confirmed page.
-5. **Admin bookings.** Email-link sign-in, the bookings page, mark as paid and cancel.
-6. **Emails.** The seven templates, Resend, and the calendar file.
-7. **Admin services, availability and settings.** Adding slots, photo upload, bank details.
-8. **Sweep, polish and launch.** Expiry and reminders, desktop layout, privacy page, Netlify deploy, and a full test booking.
+2. **Booking pages (UI).** Choose service, date and time, your details, the deposit and confirmed page, the privacy page and a 404, all on dummy data. Desktop column layout.
+3. **Admin pages (UI).** Log in, bookings, services, availability and settings, all on dummy data. Desktop column layout.
+4. **Database.** The four tables, the one-booking-per-slot index, security rules, and dummy services and slots.
+5. **Booking on real data.** Home and step 1 read Supabase, open slots, `createBooking`, the real deposit and confirmed page.
+6. **Admin sign-in and bookings.** Email-link sign-in, real bookings, mark as paid, cancel, completed and no-show.
+7. **Admin services, availability and settings.** Saving services, photo upload, adding and removing slots, bank details.
+8. **Emails.** The seven templates, Resend, and the calendar file.
+9. **Sweep, polish and launch.** Expiry and reminders, titles and favicon, loading and error states, Netlify deploy, and a full test booking.
 
 Test these hardest: two people booking the same slot at once, the 2-hour expiry, the 24-hour cut-off, and times shown correctly across the clock changes in March and October.
 
@@ -279,7 +298,9 @@ These can wait until just before launch, because the build uses dummy values.
 - [ ] Her real list of services, with length and price for each.
 - [ ] Her bank account name, sort code and account number.
 - [ ] Studio address, Instagram handle and a few lines about her.
-- [ ] Her own photos. The build uses six sample photos for now, and some carry other people's watermarks.
+- [ ] Photos. Ten photos are in `public/gallery/`; `hero-pink-red-almond.jpg` is the hero. Confirm they are her work and fine to publish.
+- [ ] Should she manage gallery photos from admin (a `gallery_photos` table and upload page), or is a fixed list updated by a developer enough?
+- [ ] Her usual hours for "Find us", and the rest of the terms (lateness, allergies, refunds if she cancels).
 - [ ] Her own email address for sign-in and notices.
 - [ ] Deposit rule: "no notice" is read here as the deposit being non-refundable whenever a client cancels. Confirm the wording.
 - [ ] The logo's small text reads "The neils". Confirm the spelling and get a clean logo file.
