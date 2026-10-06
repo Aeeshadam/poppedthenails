@@ -1,11 +1,11 @@
 import { TextLink } from "@/components/TextLink";
-import type { Service } from "@/lib/dummy";
+import type { Service } from "@/lib/types";
 import { formatPounds } from "@/lib/money";
 
 export function Services({ services }: { services: Service[] }) {
   return (
     <section aria-labelledby="services-heading">
-      <h2 id="services-heading" className="font-serif text-[30px]">
+      <h2 id="services-heading" className="font-serif text-section">
         Services
       </h2>
       <ul className="mt-4">

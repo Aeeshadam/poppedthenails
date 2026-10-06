@@ -1,26 +1,30 @@
 import { About } from "@/components/home/About";
-import { Gallery } from "@/components/home/Gallery";
+import { FindUs } from "@/components/home/FindUs";
 import { GoodToKnow } from "@/components/home/GoodToKnow";
 import { Hero } from "@/components/home/Hero";
+import { PhotoCarousel } from "@/components/home/PhotoCarousel";
 import { Services } from "@/components/home/Services";
-import { business, galleryPhotos, heroPhoto, services } from "@/lib/dummy";
+import { activeServices, business, depositPounds, galleryPhotos, heroPhoto, settings } from "@/lib/dummy";
 
 export default function Home() {
-  const activeServices = services.filter((s) => s.is_active);
-
   return (
-    <div className="mx-auto w-full max-w-5xl px-6">
-      <Hero area={business.area} depositPounds={business.depositPounds} photo={heroPhoto} />
+    <>
+      <Hero depositPounds={depositPounds} photo={heroPhoto} />
+      <PhotoCarousel photos={galleryPhotos} />
 
-      <div className="grid gap-12 pt-14 md:grid-cols-2">
-        <Services services={activeServices} />
-        <Gallery photos={galleryPhotos} instagramUrl={business.instagramUrl} />
-      </div>
+      <div className="mx-auto w-full max-w-5xl px-6">
+        <div className="grid gap-10 pt-12 md:grid-cols-2 md:gap-12">
+          <Services services={activeServices.slice(0, 4)} />
+          <div className="grid content-start gap-5">
+            <About name={business.name} aboutText={settings.about_text} />
+            <GoodToKnow depositPounds={depositPounds} />
+          </div>
+        </div>
 
-      <div className="grid gap-5 pt-14 md:grid-cols-2">
-        <About name={business.name} aboutText={business.aboutText} />
-        <GoodToKnow depositPounds={business.depositPounds} />
+        <div className="pt-14">
+          <FindUs address={settings.address} hoursNote={settings.hours_note} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
