@@ -28,6 +28,7 @@ One Next.js app holds the public site, the booking flow and the admin pages. Thr
 | --- | --- | --- | --- |
 | Framework | Next.js (App Router) + TypeScript | Pages, server actions, API routes | Free |
 | Styling | Tailwind CSS | The purple design as reusable tokens | Free |
+| Calendar | DayPicker (`@daypicker/react`) | The month calendar on step 2. Days are matched to slots by UK date, not the visitor's time zone. | Free |
 | Hosting | Netlify | Builds from GitHub, runs server code as functions, scheduled functions | Free plan: 300 credits a month, 15 per production deploy |
 | Database | Supabase Postgres | Services, slots, bookings, settings | Free tier |
 | Admin login | Supabase Auth, email link | Her sign-in, no password | Free tier |
@@ -58,7 +59,6 @@ Three things to know before building:
 | `/admin/availability` | Availability | Her | Add and remove the dates and times she is free |
 | `/admin/settings` | Settings (no design yet; follow the other admin pages) | Her | Bank details, address, usual hours, Instagram, about text, deposit wording, hold hours, minimum notice |
 | `/terms` | Terms and conditions | Public | Deposit and cancellation policy, holding a slot, booking notice, on the day. Linked from "Good to know", the footer and the policy checkbox on step 3. |
-| `/privacy` | Privacy notice | Public | Short plain-English page, linked in the footer |
 
 Server endpoints:
 
@@ -77,13 +77,13 @@ Home page sections, top to bottom:
 
 - **Header:** logo and a "Book now" button.
 - **Hero:** the hero photo in an arched card, darkened towards the bottom, with "hey gorgeous", "Pretty nails, happy you." and a white "Book your slot" button on top. A one-line intro sits under the card.
-- **Photo carousel:** arched slides of the gallery photos. It moves on by itself every 4 seconds and can be swiped. It pauses while the visitor is touching, hovering over or focused on it, starts again 6 seconds after they stop, and loops back to the start after the last photo. It never moves by itself when the device asks for reduced motion, and a Pause button stops it (WCAG 2.2.2). "Gallery →" links to `/gallery`.
+- **Photo carousel:** arched slides of the gallery photos. It moves on by itself every 4 seconds, loops back to the start after the last photo, and can be swiped. Swiping (or tapping an arrow on desktop) pauses it, and a Pause/Play button stops and restarts it (WCAG 2.2.2). It never moves by itself when the device asks for reduced motion. "Gallery →" links to `/gallery`.
 - **Services:** the first four active services, and "See all services & book".
 - **About** and **Good to know** cards. Good to know links to `/terms`.
 - **Find us:** a drawn map preview (not a live map, so nothing loads from Google), the address on two lines, her usual hours, and "Get directions", which opens Google Maps.
-- **Footer:** logo; links to Gallery, Book now and Terms & conditions; Instagram; copyright and Privacy.
+- **Footer:** logo; links to Gallery, Book now and Terms & conditions; Instagram; copyright.
 
-On desktop (768px and wider) the home page sits in a 1024px column. The hero becomes two columns: the headline, intro and a purple "Book your slot" button on the left, and the arched photo on the right. The carousel shows four photos at a time, without the enlarged active slide, and adds previous and next arrow buttons because there is no swipe.
+On desktop (768px and wider) the home page sits in a 1024px column. The hero becomes two columns: the headline, intro and a purple "Book your slot" button on the left, and the arched photo on the right. The carousel shows four photos at a time and adds previous and next arrow buttons because there is no swipe.
 
 ## Data model
 
@@ -224,7 +224,7 @@ The browser can read only public content. Every write, and every read of client 
 - **Slots endpoint.** Returns open start times only, never who booked.
 - **Spam.** Validate the form on the server with Zod, add a hidden honeypot field, and limit bookings to 3 per email address per day.
 - **Sweep endpoint.** Rejects calls without the `CRON_SECRET` header.
-- **Personal data.** She holds names, emails and phone numbers, so UK GDPR applies. Add a short privacy page and delete client details from bookings older than 12 months. Check whether she needs to register with the ICO.
+- **Personal data.** She holds names, emails and phone numbers, so UK GDPR applies. Delete client details from bookings older than 12 months. Check whether she needs to register with the ICO. There is no privacy page for now (decided 6 October 2026); see open questions.
 
 ## Environment and deployment
 
@@ -280,7 +280,7 @@ Shape and spacing: buttons and chips are fully rounded pills, 54 to 56px tall. C
 Every screen is built first with dummy data, then the database and logic go in behind it.
 
 1. **Project setup.** Next.js, TypeScript, Tailwind with the tokens above, fonts, the logo, and the home page with dummy data.
-2. **Booking pages (UI).** Choose service, date and time, your details, the deposit and confirmed page, the privacy page and a 404, all on dummy data. Desktop column layout.
+2. **Booking pages (UI).** Choose service, date and time, your details, the deposit and confirmed page, the gallery and terms pages, and a 404, all on dummy data. Desktop column layout.
 3. **Admin pages (UI).** Log in, bookings, services, availability and settings, all on dummy data. Desktop column layout.
 4. **Database.** The four tables, the one-booking-per-slot index, security rules, and dummy services and slots.
 5. **Booking on real data.** Home and step 1 read Supabase, open slots, `createBooking`, the real deposit and confirmed page.
@@ -294,6 +294,8 @@ Test these hardest: two people booking the same slot at once, the 2-hour expiry,
 ## Open questions for her
 
 These can wait until just before launch, because the build uses dummy values.
+
+- [ ] Privacy notice. The privacy page was removed on 6 October 2026. UK GDPR expects clients to be told what is kept about them, why and for how long, so confirm before launch whether a short notice is needed (it could be a section on the terms page).
 
 - [ ] Her real list of services, with length and price for each.
 - [ ] Her bank account name, sort code and account number.

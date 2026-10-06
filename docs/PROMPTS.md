@@ -55,8 +55,8 @@ settings (bank details, deposit policy) and a few bookings.
    pending_deposit and "docs/designs/Confirmed (after she marks it paid).png" once
    confirmed, plus clear messages for expired and cancelled. Use dummy tokens so each
    state can be opened. Copy buttons work; "I've sent it" only changes the screen.
-5. /privacy with a short plain-English notice, /terms with the deposit and booking terms,
-   and /gallery with every gallery photo, all linked in the footer, and a 404 page.
+5. /terms with the deposit and booking terms, and /gallery with every gallery photo,
+   both linked in the footer, and a 404 page.
 6. The desktop layout: booking pages centred in a column about 480px wide.
 
 Add small helpers for displaying dates and times in Europe/London, with tests that
