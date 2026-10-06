@@ -1,19 +1,38 @@
-import { business } from "@/lib/dummy";
+import Link from "next/link";
+import { settings } from "@/lib/dummy";
 import { Logo } from "./Logo";
 
+const links = [
+  { href: "/gallery", label: "Gallery" },
+  { href: "/book", label: "Book now" },
+  { href: "/terms", label: "Terms & conditions" },
+];
+
 export function Footer() {
+  const year = new Date().getFullYear();
+
   return (
     <footer className="mt-16 bg-ink text-white">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-6 py-10">
+      <div className="mx-auto w-full max-w-5xl px-6 pt-10 pb-8">
         <Logo />
-        <p className="text-sm text-white/80">{business.address}</p>
+        <nav aria-label="Footer" className="mt-5">
+          <ul>
+            {links.map((link) => (
+              <li key={link.href} className="border-b border-white/10">
+                <Link href={link.href} className="flex min-h-12 items-center font-medium hover:text-lilac">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
         <a
-          href={business.instagramUrl}
-          className="inline-flex min-h-11 w-fit items-center text-sm font-medium underline underline-offset-4 hover:text-lilac"
+          href={`https://www.instagram.com/${settings.instagram_handle}`}
+          className="mt-4 inline-flex min-h-11 items-center text-[15px] text-lilac underline underline-offset-4 hover:text-white"
         >
-          Instagram @{business.instagramHandle}
+          Instagram @{settings.instagram_handle}
         </a>
-        <p className="text-[13px] text-white/60">© poppedthenail</p>
+        <p className="mt-2 text-[13px] text-white/60">© {year} poppedthenail</p>
       </div>
     </footer>
   );

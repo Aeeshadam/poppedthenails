@@ -1,16 +1,12 @@
-import type { ReactNode } from "react";
+import type { ComponentProps } from "react";
 
-type CardProps = {
+type CardProps = ComponentProps<"div"> & {
   /** "raised": white card. "outline": page background with a border. */
   variant?: "raised" | "outline";
-  className?: string;
-  children: ReactNode;
 };
 
-export function Card({ variant = "raised", className = "", children }: CardProps) {
-  const look =
-    variant === "raised"
-      ? "bg-surface"
-      : "border border-line bg-background";
-  return <div className={`rounded-card p-6 ${look} ${className}`}>{children}</div>;
+/** Rounded card surface. Callers set the padding, since it varies by design. */
+export function Card({ variant = "raised", className = "", ...rest }: CardProps) {
+  const look = variant === "raised" ? "bg-surface" : "border border-line bg-background";
+  return <div {...rest} className={`rounded-card ${look} ${className}`} />;
 }

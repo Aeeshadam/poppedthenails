@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/logo.png";
 
-/** The Popped logo, linking home. */
 export function Logo({ className = "" }: { className?: string }) {
   return (
     <Link

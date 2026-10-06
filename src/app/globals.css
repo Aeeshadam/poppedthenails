@@ -21,7 +21,21 @@
   --font-script: var(--font-sacramento), cursive;
 
   --radius-card: 24px;
+  --radius-card-lg: 28px;
+  --radius-photo: 20px;
   --radius-input: 14px;
+
+  /* Type scale from the spec: page titles, home section titles, card titles. */
+  --text-title: 32px;
+  --text-title--line-height: 1.25;
+  --text-section: 30px;
+  --text-section--line-height: 1.2;
+  --text-card-title: 22px;
+  --text-card-title--line-height: 1.3;
+
+  /* Page columns: booking and admin screens, and long-form pages. */
+  --container-column: 480px;
+  --container-reading: 640px;
 }
 
 body {
