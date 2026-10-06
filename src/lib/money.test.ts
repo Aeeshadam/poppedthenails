@@ -14,4 +14,8 @@ describe("formatPounds", () => {
   it("handles zero", () => {
     expect(formatPounds(0)).toBe("£0");
   });
+
+  it("can show pence for deposit amounts", () => {
+    expect(formatPounds(5, { pence: true })).toBe("£5.00");
+  });
 });

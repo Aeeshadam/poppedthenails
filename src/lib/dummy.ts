@@ -1,92 +1,79 @@
-// Hard-coded dummy content for the home page. Step 3 replaces this with
+// Hard-coded dummy content for building the screens. Step 5 replaces this with
 // the services and settings tables in Supabase.
 
-export type Service = {
-  id: string;
-  name: string;
-  description: string | null;
-  duration_min: number;
-  price_pounds: number;
-  deposit_pounds: number;
-  photo_path: string | null;
-  is_active: boolean;
-};
+import type { Service, Settings } from "./types";
 
+function service(
+  id: string,
+  name: string,
+  duration_min: number,
+  price_pounds: number,
+  description: string | null = null,
+  is_active = true,
+): Service {
+  return { id, name, description, duration_min, price_pounds, deposit_pounds: 5, photo_path: null, is_active };
+}
+
+/** Listed in the order they were added. Chrome powder is switched off. */
 export const services: Service[] = [
-  {
-    id: "dummy-gel",
-    name: "Gel manicure",
-    description: null,
-    duration_min: 45,
-    price_pounds: 25,
-    deposit_pounds: 5,
-    photo_path: null,
-    is_active: true,
-  },
-  {
-    id: "dummy-biab",
-    name: "BIAB overlay",
-    description: null,
-    duration_min: 60,
-    price_pounds: 35,
-    deposit_pounds: 5,
-    photo_path: null,
-    is_active: true,
-  },
-  {
-    id: "dummy-acrylic",
-    name: "Acrylic full set",
-    description: null,
-    duration_min: 90,
-    price_pounds: 45,
-    deposit_pounds: 5,
-    photo_path: null,
-    is_active: true,
-  },
-  {
-    id: "dummy-art",
-    name: "Nail art",
-    description: null,
-    duration_min: 30,
-    price_pounds: 15,
-    deposit_pounds: 5,
-    photo_path: null,
-    is_active: true,
-  },
+  service("gel", "Gel manicure", 45, 25, "Gel colour on your natural nails."),
+  service("biab", "BIAB overlay", 60, 35, "Builder gel to strengthen your natural nails."),
+  service("biab-infill", "BIAB infill", 60, 30, "Infill for an existing BIAB set."),
+  service("acrylic", "Acrylic full set", 90, 45, "A new set of acrylic extensions."),
+  service("removal", "Gel removal", 20, 10, "Gentle removal of gel or BIAB."),
+  service("art", "Nail art", 15, 10, "Hand-painted designs on top of any set."),
+  service("chrome", "Chrome powder", 15, 8, "Mirror chrome finish.", false),
 ];
 
-export const business = {
-  name: "Popped the Nail",
-  area: "Manchester",
-  address: "[Studio address, Town, Postcode]",
-  instagramHandle: "poppedthenail",
-  instagramUrl: "https://www.instagram.com/poppedthenail",
-  aboutText:
+export const activeServices = services.filter((s) => s.is_active);
+
+export function findActiveService(id: string | undefined): Service | undefined {
+  return activeServices.find((s) => s.id === id);
+}
+
+/**
+ * The deposit to quote on the home, /book and terms pages. Deposits are set
+ * per service (default £5), so quote the lowest one in use.
+ */
+export const depositPounds = Math.min(...activeServices.map((s) => s.deposit_pounds));
+
+export const settings: Settings = {
+  bank_account_name: "[Account name]",
+  bank_sort_code: "[00-00-00]",
+  bank_account_number: "[00000000]",
+  hold_hours: 2,
+  min_notice_hours: 24,
+  deposit_policy:
+    "Your £5 deposit secures your slot and comes off your total on the day. It is non-refundable if you cancel.",
+  address: "[Address line]\n[Town, Postcode]",
+  hours_note: "Weekday evenings from 5pm and weekends. Times vary, so check the booking calendar.",
+  instagram_handle: "poppedthenail",
+  about_text:
     "[A couple of lines about her — training, style, what clients love about coming in.]",
-  depositPounds: 5,
 };
 
-/** Placeholder photos in public/sample/. Not her work. */
+/** Fixed details that aren't in the settings table. */
+export const business = {
+  name: "Popped the Nail",
+  ownerName: "[Name]",
+  area: "Manchester",
+};
+
+/** Photos in public/gallery/. The hero photo also ends the carousel, so all ten appear there. */
 export const heroPhoto = {
-  src: "/sample/photo-4.jpg",
-  alt: "Almond nails in pink chrome",
+  src: "/gallery/hero-pink-red-almond.jpg",
+  alt: "Long almond nails in pink with red heart art",
 };
 
 export const galleryPhotos = [
-  {
-    src: "/sample/photo-3.jpg",
-    alt: "Long almond nails with bright summer art",
-  },
-  {
-    src: "/sample/photo-2.jpg",
-    alt: "Deep red nails with cherry and tortoiseshell art",
-  },
-  {
-    src: "/sample/photo-5.jpg",
-    alt: "Pale pink nails with tiny burgundy hearts",
-  },
-  {
-    src: "/sample/photo-6.jpg",
-    alt: "Pink nails with flower details and ridged accents",
-  },
+  { src: "/gallery/blush-marble-almond.jpg", alt: "Almond nails in blush pink with white marble art" },
+  { src: "/gallery/french-blue-flowers.jpg", alt: "French tips with hand-painted blue flowers" },
+  { src: "/gallery/lilac-french-square.jpg", alt: "Square nails with lilac French tips and a gem accent" },
+  { src: "/gallery/short-mixed-art.jpg", alt: "Short nails with mixed hand-painted art and a star charm" },
+  { src: "/gallery/classic-french-almond.jpg", alt: "Almond nails with classic white French tips" },
+  { src: "/gallery/french-black-stars.jpg", alt: "Pink French tips with black star accents" },
+  { src: "/gallery/milky-pink-short.jpg", alt: "Short square nails in milky pink" },
+  { src: "/gallery/white-french-square.jpg", alt: "Square nails with crisp white French tips" },
+  { src: "/gallery/sheer-nude-almond.jpg", alt: "Short almond nails in sheer nude pink" },
+  heroPhoto,
 ];
