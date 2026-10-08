@@ -27,6 +27,8 @@ Node 22 or later.
 - Lint: `npm run lint` (ESLint CLI; `next lint` no longer exists in Next 16)
 - Tests: `npm test` (Vitest, single run); `npm run test:watch` while working
 - Production build: `npm run build`
+- Apply migrations and seed to the linked Supabase project: `npm run db:push`
+- Regenerate database types after a migration: `npm run db:types`
 
 Run type check, lint and tests before saying a step is finished.
 

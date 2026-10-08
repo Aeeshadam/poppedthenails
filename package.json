@@ -9,15 +9,19 @@
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "db:push": "npx supabase db push --include-seed",
+    "db:types": "npx supabase gen types typescript --linked --schema public > src/lib/supabase/database.types.ts"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",
     "@daypicker/react": "^10.0.2",
+    "@supabase/supabase-js": "^2.117.3",
     "date-fns": "^4.4.0",
     "next": "16.3.8",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
