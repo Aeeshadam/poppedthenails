@@ -24,7 +24,7 @@ export default async function Home() {
         <div className="grid gap-10 pt-12 md:grid-cols-2 md:gap-12">
           <Services services={services.slice(0, 4)} />
           <div className="grid content-start gap-5">
-            <About name={business.name} aboutText={settings.about_text} />
+            <About name={business.ownerName} aboutText={settings.about_text} />
             <GoodToKnow depositPounds={deposit} />
           </div>
         </div>

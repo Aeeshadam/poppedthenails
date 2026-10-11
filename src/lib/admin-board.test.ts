@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { boardSections, greeting, hasFinished, type BoardBooking } from "./admin-board";
+import { boardSections, greeting, hasFinished, nextStatus, type BoardBooking } from "./admin-board";
 
 function booking(id: string, status: BoardBooking["status"], starts_at: string, expires_at = starts_at): BoardBooking {
   return {
@@ -10,6 +10,8 @@ function booking(id: string, status: BoardBooking["status"], starts_at: string, 
     duration_min: 45,
     starts_at,
     client_name: id,
+    client_phone: "07700900000",
+    client_email: `${id}@example.com`,
     notes: null,
     status,
     expires_at,
@@ -62,5 +64,30 @@ describe("hasFinished", () => {
 
   it("is true from the end time", () => {
     expect(hasFinished(appointment, new Date("2026-10-09T09:45:00Z"))).toBe(true);
+  });
+});
+
+describe("nextStatus", () => {
+  const now = new Date("2026-10-09T12:00:00Z");
+  const past = { starts_at: "2026-10-09T10:00:00Z", duration_min: 45 };
+  const future = { starts_at: "2026-10-12T10:00:00Z", duration_min: 45 };
+
+  it("marks an unpaid booking as paid", () => {
+    expect(nextStatus({ ...future, status: "pending_deposit" }, "mark-paid", now)).toBe("confirmed");
+    expect(nextStatus({ ...future, status: "confirmed" }, "mark-paid", now)).toBeNull();
+    expect(nextStatus({ ...future, status: "cancelled" }, "mark-paid", now)).toBeNull();
+  });
+
+  it("cancels unpaid and confirmed bookings only", () => {
+    expect(nextStatus({ ...future, status: "pending_deposit" }, "cancel", now)).toBe("cancelled");
+    expect(nextStatus({ ...future, status: "confirmed" }, "cancel", now)).toBe("cancelled");
+    expect(nextStatus({ ...past, status: "completed" }, "cancel", now)).toBeNull();
+  });
+
+  it("marks completed or no-show only after a confirmed appointment has ended", () => {
+    expect(nextStatus({ ...past, status: "confirmed" }, "completed", now)).toBe("completed");
+    expect(nextStatus({ ...past, status: "confirmed" }, "no-show", now)).toBe("no_show");
+    expect(nextStatus({ ...future, status: "confirmed" }, "completed", now)).toBeNull();
+    expect(nextStatus({ ...past, status: "pending_deposit" }, "no-show", now)).toBeNull();
   });
 });

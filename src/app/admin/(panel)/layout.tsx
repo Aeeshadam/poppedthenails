@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { AccountLinks } from "@/components/admin/AccountLinks";
 import { AdminTabs } from "@/components/admin/AdminTabs";
 import { Logo } from "@/components/Logo";
+import { requireAdmin } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "Admin · poppedthenail", robots: { index: false } };
 
-/** UI only: step 6 adds the ADMIN_EMAIL check and real sign-out. */
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  await requireAdmin();
   return (
     <main className="mx-auto w-full max-w-column flex-1 px-6 pt-4 pb-12">
       <header className="flex items-center justify-between gap-3">

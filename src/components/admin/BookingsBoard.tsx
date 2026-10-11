@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { cancelBooking, markCompleted, markNoShow, markPaid } from "@/app/admin/actions";
 import { EmptyState } from "@/components/EmptyState";
 import { SectionLabel } from "@/components/SectionLabel";
 import { useNow } from "@/hooks/useNow";
 import { boardSections, greeting, type BoardBooking } from "@/lib/admin-board";
 import { formatDayLong } from "@/lib/dates";
-import type { BookingStatus } from "@/lib/types";
 import { Stat } from "./bookings/Stat";
 import { TodayCard } from "./bookings/TodayCard";
 import { UpcomingList } from "./bookings/UpcomingList";
@@ -20,23 +20,25 @@ type BookingsBoardProps = {
   holdHours: number;
 };
 
-/** UI only: step 6 adds markPaid, cancelBooking and the rest. */
-export function BookingsBoard({ bookings: initial, ownerName, now: initialNow, holdHours }: BookingsBoardProps) {
-  const [bookings, setBookings] = useState(initial);
+/** Each button runs a server action; the page then refreshes from the database. */
+export function BookingsBoard({ bookings, ownerName, now: initialNow, holdHours }: BookingsBoardProps) {
   const [notice, setNotice] = useState<string | null>(null);
+  const [busy, startTransition] = useTransition();
   const hasWaiting = bookings.some((b) => b.status === "pending_deposit");
   // Tick every 30 seconds while a "time left" countdown is on screen.
   const now = useNow(initialNow, { every: 30_000, enabled: hasWaiting });
   const { waiting, today, upcoming } = boardSections(bookings, now);
 
-  function update(booking: BoardBooking, status: BookingStatus, message: string) {
-    setBookings((all) => all.map((b) => (b.id === booking.id ? { ...b, status } : b)));
-    setNotice(message);
+  function run(action: (id: string) => Promise<boolean>, booking: BoardBooking, message: string) {
+    startTransition(async () => {
+      const changed = await action(booking.id);
+      setNotice(changed ? message : `${booking.client_name}'s booking had already changed, so the page has been updated.`);
+    });
   }
 
   function cancel(booking: BoardBooking) {
     if (window.confirm(`Cancel ${booking.client_name}'s booking? The slot opens up again.`)) {
-      update(booking, "cancelled", `${booking.client_name}'s booking was cancelled.`);
+      run(cancelBooking, booking, `${booking.client_name}'s booking was cancelled.`);
     }
   }
 
@@ -66,7 +68,8 @@ export function BookingsBoard({ bookings: initial, ownerName, now: initialNow, h
               key={b.id}
               booking={b}
               now={now}
-              onMarkPaid={() => update(b, "confirmed", `${b.client_name}'s booking is confirmed.`)}
+              busy={busy}
+              onMarkPaid={() => run(markPaid, b, `${b.client_name}'s booking is confirmed.`)}
               onCancel={() => cancel(b)}
             />
           ))}
@@ -83,8 +86,9 @@ export function BookingsBoard({ bookings: initial, ownerName, now: initialNow, h
               key={b.id}
               booking={b}
               now={now}
-              onCompleted={() => update(b, "completed", `${b.client_name} marked as completed.`)}
-              onNoShow={() => update(b, "no_show", `${b.client_name} marked as a no-show.`)}
+              busy={busy}
+              onCompleted={() => run(markCompleted, b, `${b.client_name} marked as completed.`)}
+              onNoShow={() => run(markNoShow, b, `${b.client_name} marked as a no-show.`)}
             />
           ))}
         </ul>

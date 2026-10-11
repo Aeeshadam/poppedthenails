@@ -1,7 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { IconLink } from "@/components/IconButton";
+import { signOut } from "@/app/admin/actions";
+import { IconButton, IconLink } from "@/components/IconButton";
 import { Gear, SignOut } from "@/components/icons";
 
 export function AccountLinks() {
@@ -17,10 +18,11 @@ export function AccountLinks() {
       >
         <Gear />
       </IconLink>
-      {/* UI only: step 6 signs out with Supabase before going to the login page. */}
-      <IconLink href="/admin/login" label="Sign out" variant="ghost">
-        <SignOut />
-      </IconLink>
+      <form action={signOut}>
+        <IconButton type="submit" label="Sign out" variant="ghost">
+          <SignOut />
+        </IconButton>
+      </form>
     </nav>
   );
 }

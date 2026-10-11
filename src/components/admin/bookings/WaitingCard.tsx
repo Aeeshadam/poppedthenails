@@ -4,15 +4,18 @@ import { Check } from "@/components/icons";
 import type { BoardBooking } from "@/lib/admin-board";
 import { formatDayShort, formatTime, formatTimeLeft, msUntil } from "@/lib/dates";
 import { formatPounds } from "@/lib/money";
+import { ClientContact } from "./ClientContact";
 
 type WaitingCardProps = {
   booking: BoardBooking;
   now: Date;
+  /** True while a change is being saved. */
+  busy?: boolean;
   onMarkPaid: () => void;
   onCancel: () => void;
 };
 
-export function WaitingCard({ booking: b, now, onMarkPaid, onCancel }: WaitingCardProps) {
+export function WaitingCard({ booking: b, now, busy, onMarkPaid, onCancel }: WaitingCardProps) {
   // A client who says they've paid is held until she checks (spec), so no countdown.
   const holdNote = b.client_says_paid_at
     ? "held until you check"
@@ -30,16 +33,17 @@ export function WaitingCard({ booking: b, now, onMarkPaid, onCancel }: WaitingCa
       <p className="text-[15px] text-muted">
         Ref {b.reference} · {holdNote}
       </p>
+      <ClientContact phone={b.client_phone} email={b.client_email} />
       {b.client_says_paid_at && (
         <p className="mt-2 flex items-center gap-1.5 text-[15px] font-semibold text-success">
           <Check className="size-4" /> Client says they&rsquo;ve paid
         </p>
       )}
       <div className="mt-4 flex gap-3">
-        <Button size="md" className="flex-1" onClick={onMarkPaid}>
+        <Button size="md" className="flex-1" onClick={onMarkPaid} disabled={busy}>
           Mark as paid
         </Button>
-        <Button size="md" variant="secondary" onClick={onCancel}>
+        <Button size="md" variant="secondary" onClick={onCancel} disabled={busy}>
           Cancel
         </Button>
       </div>

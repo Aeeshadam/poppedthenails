@@ -1,8 +1,8 @@
 
 import { addMinutes, londonDateKey, londonHour } from "./dates";
-import type { Booking } from "./types";
+import type { Booking, BookingStatus } from "./types";
 
-/** The fields the board shows. The page sends only these, never contact details. */
+/** The fields the board shows. Only she sees them: every admin page checks she is signed in. */
 export type BoardBooking = Pick<
   Booking,
   | "id"
@@ -12,6 +12,8 @@ export type BoardBooking = Pick<
   | "duration_min"
   | "starts_at"
   | "client_name"
+  | "client_phone"
+  | "client_email"
   | "notes"
   | "status"
   | "expires_at"
@@ -55,4 +57,29 @@ export function greeting(now: Date): string {
 
 export function hasFinished(booking: Pick<BoardBooking, "starts_at" | "duration_min">, now: Date): boolean {
   return addMinutes(booking.starts_at, booking.duration_min) <= now;
+}
+
+/** The status changes she can make from the bookings page. */
+export type AdminAction = "mark-paid" | "cancel" | "completed" | "no-show";
+
+const MOVES: Record<AdminAction, { from: BookingStatus[]; to: BookingStatus; afterEnd?: boolean }> = {
+  "mark-paid": { from: ["pending_deposit"], to: "confirmed" },
+  cancel: { from: ["pending_deposit", "confirmed"], to: "cancelled" },
+  completed: { from: ["confirmed"], to: "completed", afterEnd: true },
+  "no-show": { from: ["confirmed"], to: "no_show", afterEnd: true },
+};
+
+/**
+ * The new status if the action is allowed, or null. Completed and no-show are
+ * only allowed once the appointment has ended.
+ */
+export function nextStatus(
+  booking: Pick<Booking, "status" | "starts_at" | "duration_min">,
+  action: AdminAction,
+  now: Date,
+): BookingStatus | null {
+  const move = MOVES[action];
+  if (!move.from.includes(booking.status)) return null;
+  if (move.afterEnd && !hasFinished(booking, now)) return null;
+  return move.to;
 }

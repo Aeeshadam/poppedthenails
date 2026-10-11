@@ -1,9 +1,11 @@
+import { requireAdmin } from "@/lib/auth";
 import { AvailabilityEditor, type AdminSlot } from "@/components/admin/AvailabilityEditor";
 import { londonDateKey } from "@/lib/dates";
 import { buildDummyData, liveBookingsBySlot } from "@/lib/dummy-bookings";
 import { requestTime } from "@/lib/request-time";
 
 export default async function AdminAvailabilityPage() {
+  await requireAdmin();
   const now = await requestTime();
   const data = buildDummyData(now);
   const live = liveBookingsBySlot(data);

@@ -17,7 +17,7 @@ Decisions already made:
 - **Availability:** she adds each open date and time herself. There are no weekly opening hours to maintain.
 - **Notice:** clients can book up to 24 hours before a slot, not later.
 - **Services:** each is booked on its own. No add-ons and no clean-up gap.
-- **Accounts:** clients never log in. Only she logs in, by email link.
+- **Accounts:** clients never log in. Only she logs in, with her email and password (changed from an email link on 11 October 2026: faster day to day, and email links fail when a phone opens them in a different browser). Her session lasts, so she signs in about once per device.
 - **Time zone:** everything is shown in UK time (Europe/London) and stored in UTC.
 
 ## Stack and accounts
@@ -31,7 +31,7 @@ One Next.js app holds the public site, the booking flow and the admin pages. Thr
 | Calendar | DayPicker (`@daypicker/react`) | The month calendar on step 2. Days are matched to slots by UK date, not the visitor's time zone. | Free |
 | Hosting | Netlify | Builds from GitHub, runs server code as functions, scheduled functions | Free plan: 300 credits a month, 15 per production deploy |
 | Database | Supabase Postgres | Services, slots, bookings, settings | Free tier |
-| Admin login | Supabase Auth, email link | Her sign-in, no password | Free tier |
+| Admin login | Supabase Auth, email and password | Her sign-in; "Forgot password?" sends a reset link | Free tier |
 | Photos | Supabase Storage, and `public/gallery/` for now | Service photos in Storage. Gallery photos are a fixed list in code for now (see open questions). | Free tier |
 | Email | Resend + React Email | All client and admin emails | Free tier, check current limits |
 | Domain | Any registrar | Site address and the email sending address | About £10 a year |
@@ -53,7 +53,9 @@ Three things to know before building:
 | `/book/time?service=…` | Step 2, date and time | Public | Shows the days that have open slots, then the times on the chosen day |
 | `/book/details?service=…&slot=…` | Step 3, your details | Public | Name, email, mobile, notes, policy checkbox |
 | `/booking/[token]` | Send deposit, then Confirmed | Public, by secret link | One page that changes with the booking status. Shows bank details only here. |
-| `/admin/login` | Admin log in | Her | Email link |
+| `/admin/login` | Admin log in | Her | Email and password, and "Forgot password?". Only `ADMIN_EMAIL` is accepted; anyone else is politely refused |
+| `/admin/reset-password` | Set a new password | Her, from the reset email | At least 12 characters |
+| `/auth/callback` | (no page) | Her | Where the reset link lands; signs her in and goes on to `/admin/reset-password` |
 | `/admin` | Bookings | Her | Waiting for deposit, today, upcoming. Mark as paid, cancel. |
 | `/admin/services` | Services | Her | Add, edit, show or hide |
 | `/admin/availability` | Availability | Her | Add and remove the dates and times she is free |
@@ -238,14 +240,14 @@ The browser can read only public content. Every write, and every read of client 
 | `RESEND_API_KEY` | Sending email | Yes |
 | `EMAIL_FROM` | Sender address. Resend's test sender until the domain is bought, then `bookings@poppedthenail.co.uk` | No |
 | `ADMIN_EMAIL` | The one email allowed into `/admin`, and where her notices go. aeeshaht@gmail.com for now. | No |
-| `SITE_URL` | Links in emails and the sign-in redirect. `http://localhost:3000` locally, the Netlify address when deployed. | No |
+| `SITE_URL` | Links in emails and the password-reset redirect. `http://localhost:3000` locally, the Netlify address when deployed. | No |
 | `CRON_SECRET` | Protects the sweep endpoint | Yes |
 
 Setup steps, in order:
 
 1. Create the Supabase project in a London or EU region. Run the SQL migrations for the tables, the one-booking-per-slot index and the security rules.
 2. Create a public Storage bucket called `photos`.
-3. In Supabase Auth, set the site URL and redirect URLs (localhost and the Netlify address) and turn off sign-ups. Create her user by hand.
+3. In Supabase Auth, set the site URL and add `/auth/callback` on localhost and the Netlify address as redirect URLs, and turn off sign-ups. Create her user by hand with a password of at least 12 characters.
 4. Connect the GitHub repo to Netlify and add the environment variables.
 5. Add the scheduled function for `/api/cron/sweep`, every 15 minutes.
 6. Deploy, then run one test booking end to end on the Netlify address.
@@ -286,7 +288,7 @@ Every screen is built first with dummy data, then the database and logic go in b
 3. **Admin pages (UI).** Log in, bookings, services, availability and settings, all on dummy data. Desktop column layout.
 4. **Database.** The four tables, the one-booking-per-slot index, security rules, and dummy services and slots.
 5. **Booking on real data.** Home and step 1 read Supabase, open slots, `createBooking`, the real deposit and confirmed page.
-6. **Admin sign-in and bookings.** Email-link sign-in, real bookings, mark as paid, cancel, completed and no-show.
+6. **Admin sign-in and bookings.** Email and password sign-in, real bookings, mark as paid, cancel, completed and no-show.
 7. **Admin services, availability and settings.** Saving services, photo upload, adding and removing slots, bank details.
 8. **Emails.** The seven templates, Resend, and the calendar file.
 9. **Sweep, polish and launch.** Expiry and reminders, titles and favicon, loading and error states, Netlify deploy, and a full test booking.

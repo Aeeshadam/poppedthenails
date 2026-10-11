@@ -4,10 +4,13 @@ import { Card } from "@/components/Card";
 import { hasFinished, type BoardBooking } from "@/lib/admin-board";
 import { formatTime } from "@/lib/dates";
 import { formatPounds } from "@/lib/money";
+import { ClientContact } from "./ClientContact";
 
 type TodayCardProps = {
   booking: BoardBooking;
   now: Date;
+  /** True while a change is being saved. */
+  busy?: boolean;
   onCompleted: () => void;
   onNoShow: () => void;
 };
@@ -18,7 +21,7 @@ function StatusBadge({ booking: b }: { booking: BoardBooking }) {
   return <Badge tone="success">Paid {formatPounds(b.deposit_pounds)}</Badge>;
 }
 
-export function TodayCard({ booking: b, now, onCompleted, onNoShow }: TodayCardProps) {
+export function TodayCard({ booking: b, now, busy, onCompleted, onNoShow }: TodayCardProps) {
   return (
     <li>
       <Card className="p-5">
@@ -33,15 +36,16 @@ export function TodayCard({ booking: b, now, onCompleted, onNoShow }: TodayCardP
               {b.service_name}
               {b.notes && <> · &ldquo;{b.notes}&rdquo;</>}
             </p>
+            <ClientContact phone={b.client_phone} email={b.client_email} />
           </div>
           <StatusBadge booking={b} />
         </div>
         {b.status === "confirmed" && hasFinished(b, now) && (
           <div className="mt-4 flex gap-3">
-            <Button size="md" variant="secondary" className="flex-1" onClick={onCompleted}>
+            <Button size="md" variant="secondary" className="flex-1" onClick={onCompleted} disabled={busy}>
               Completed
             </Button>
-            <Button size="md" variant="secondary" className="flex-1" onClick={onNoShow}>
+            <Button size="md" variant="secondary" className="flex-1" onClick={onNoShow} disabled={busy}>
               No-show
             </Button>
           </div>

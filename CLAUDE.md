@@ -12,7 +12,7 @@ A booking website for a one-person nail business. Clients pick a service and one
 
 - Next.js (App Router) with TypeScript, strict mode
 - Tailwind CSS, using the design tokens in the spec
-- Supabase: Postgres, Auth (email link, admin only), Storage
+- Supabase: Postgres, Auth (email and password, admin only), Storage
 - Resend with React Email
 - Hosted on Netlify; a scheduled function runs the sweep
 - Vitest for unit tests

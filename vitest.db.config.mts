@@ -13,5 +13,7 @@ export default defineConfig({
     include: ["src/**/*.db.test.ts"],
     env: loadEnv("development", process.cwd(), ""),
     testTimeout: 20_000,
+    // One file at a time: they share the database, so parallel files would race for the same slot.
+    fileParallelism: false,
   },
 });

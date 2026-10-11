@@ -155,7 +155,7 @@ Done when: hiding a service in the Supabase dashboard removes it from the site, 
 Read CLAUDE.md and docs/SPEC.md.
 
 Wire the admin screens from step 3 to Supabase:
-1. /admin/login uses Supabase Auth email link. Only ADMIN_EMAIL may sign in; anyone
+1. /admin/login uses Supabase Auth email and password, with "Forgot password?". Only ADMIN_EMAIL may sign in; anyone
    else sees a polite refusal.
 2. Every admin route and action checks the signed-in email equals ADMIN_EMAIL on the
    server. Sign out works.
@@ -169,7 +169,7 @@ redirect URLs, sign-ups off) and how to create the admin user.
 Show me your plan first.
 ```
 
-Done when: you sign in by email link, mark your test booking as paid, and its booking page switches to "You're booked".
+Done when: you sign in with your email and password, mark your test booking as paid, and its booking page switches to "You're booked".
 
 ## Step 7 — Admin services, availability and settings
 
