@@ -4,25 +4,26 @@ import { BookingSteps } from "@/components/booking/BookingSteps";
 import { DetailsForm } from "@/components/booking/DetailsForm";
 import { Card } from "@/components/Card";
 import { TextLink } from "@/components/TextLink";
+import { getActiveService } from "@/lib/data/services";
+import { getPublicSettings } from "@/lib/data/settings";
+import { findBookableSlot } from "@/lib/data/slots";
 import { formatDayLong, formatTime } from "@/lib/dates";
-import { findActiveService } from "@/lib/dummy";
-import { buildDummyData, openSlots } from "@/lib/dummy-bookings";
 import { firstParam } from "@/lib/params";
 import { requestTime } from "@/lib/request-time";
 
 export const metadata: Metadata = { title: "Your details · poppedthenail" };
 
 export default async function DetailsPage({ searchParams }: PageProps<"/book/details">) {
+  const now = await requestTime();
   const params = await searchParams;
-  const service = findActiveService(firstParam(params.service));
+  const service = await getActiveService(firstParam(params.service));
   if (!service) redirect("/book");
 
-  const now = await requestTime();
-  const slotId = firstParam(params.slot);
-  const slot = openSlots(buildDummyData(now), now).find((s) => s.id === slotId);
   const timeHref = `/book/time?service=${service.id}`;
+  const { min_notice_hours } = await getPublicSettings();
+  const slot = await findBookableSlot(firstParam(params.slot) ?? "", now, min_notice_hours);
   if (!slot) redirect(timeHref);
-  const editHref = `${timeHref}&slot=${encodeURIComponent(slot.id)}`;
+  const editHref = `${timeHref}&slot=${slot.id}`;
 
   return (
     <>

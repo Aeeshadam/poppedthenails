@@ -13,13 +13,12 @@ import type { Booking, Settings } from "@/lib/types";
 type DepositViewProps = {
   booking: Pick<Booking, "reference" | "service_name" | "starts_at" | "deposit_pounds" | "client_says_paid_at">;
   bank: Pick<Settings, "bank_account_name" | "bank_sort_code" | "bank_account_number" | "hold_hours">;
+  /** The clientSaysPaid server action, already tied to this booking. */
+  onSentIt: () => Promise<void>;
 };
 
-/**
- * The only page, with email 1, that shows bank details. "I've sent it" only
- * changes the screen until step 5 adds clientSaysPaid.
- */
-export function DepositView({ booking, bank }: DepositViewProps) {
+/** The only page, with email 1, that shows bank details. */
+export function DepositView({ booking, bank, onSentIt }: DepositViewProps) {
   const [saidPaid, setSaidPaid] = useState(booking.client_says_paid_at !== null);
   const amount = formatPounds(booking.deposit_pounds, { pence: true });
   const rows = [
@@ -81,9 +80,11 @@ export function DepositView({ booking, bank }: DepositViewProps) {
             </p>
           </div>
         ) : (
-          <Button className="w-full" onClick={() => setSaidPaid(true)}>
-            I&rsquo;ve sent it <Heart />
-          </Button>
+          <form action={onSentIt} onSubmit={() => setSaidPaid(true)}>
+            <Button type="submit" className="w-full">
+              I&rsquo;ve sent it <Heart />
+            </Button>
+          </form>
         )}
       </div>
       <div className="mt-3 text-center">

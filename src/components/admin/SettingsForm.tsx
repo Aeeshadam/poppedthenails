@@ -46,9 +46,6 @@ export function SettingsForm({ settings }: { settings: Settings }) {
         <Field label="Usual hours" htmlFor="hours_note" hint="Shown under “Find us” on the home page.">
           <TextInput id="hours_note" name="hours_note" defaultValue={settings.hours_note} />
         </Field>
-        <Field label="Instagram handle" htmlFor="instagram_handle">
-          <TextInput id="instagram_handle" name="instagram_handle" defaultValue={settings.instagram_handle} placeholder="poppedthenail" />
-        </Field>
         <Field label="About you" htmlFor="about_text" hint="Shown on the home page.">
           <TextArea id="about_text" name="about_text" defaultValue={settings.about_text} rows={4} />
         </Field>

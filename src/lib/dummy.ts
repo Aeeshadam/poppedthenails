@@ -1,5 +1,5 @@
-// Hard-coded dummy content for building the screens. Step 5 replaces this with
-// the services and settings tables in Supabase.
+// Dummy services and settings for the admin screens, until steps 6 and 7 read
+// them from Supabase.
 
 import type { Service, Settings } from "./types";
 
@@ -25,18 +25,6 @@ export const services: Service[] = [
   service("chrome", "Chrome powder", 15, 8, "Mirror chrome finish.", false),
 ];
 
-export const activeServices = services.filter((s) => s.is_active);
-
-export function findActiveService(id: string | undefined): Service | undefined {
-  return activeServices.find((s) => s.id === id);
-}
-
-/**
- * The deposit to quote on the home, /book and terms pages. Deposits are set
- * per service (default £5), so quote the lowest one in use.
- */
-export const depositPounds = Math.min(...activeServices.map((s) => s.deposit_pounds));
-
 export const settings: Settings = {
   bank_account_name: "[Account name]",
   bank_sort_code: "[00-00-00]",
@@ -47,33 +35,6 @@ export const settings: Settings = {
     "Your £5 deposit secures your slot and comes off your total on the day. It is non-refundable if you cancel.",
   address: "[Address line]\n[Town, Postcode]",
   hours_note: "Weekday evenings from 5pm and weekends. Times vary, so check the booking calendar.",
-  instagram_handle: "poppedthenail",
   about_text:
     "[A couple of lines about her — training, style, what clients love about coming in.]",
 };
-
-/** Fixed details that aren't in the settings table. */
-export const business = {
-  name: "Popped the Nail",
-  ownerName: "[Name]",
-  area: "Manchester",
-};
-
-/** Photos in public/gallery/. The hero photo also ends the carousel, so all ten appear there. */
-export const heroPhoto = {
-  src: "/gallery/hero-pink-red-almond.jpg",
-  alt: "Long almond nails in pink with red heart art",
-};
-
-export const galleryPhotos = [
-  { src: "/gallery/blush-marble-almond.jpg", alt: "Almond nails in blush pink with white marble art" },
-  { src: "/gallery/french-blue-flowers.jpg", alt: "French tips with hand-painted blue flowers" },
-  { src: "/gallery/lilac-french-square.jpg", alt: "Square nails with lilac French tips and a gem accent" },
-  { src: "/gallery/short-mixed-art.jpg", alt: "Short nails with mixed hand-painted art and a star charm" },
-  { src: "/gallery/classic-french-almond.jpg", alt: "Almond nails with classic white French tips" },
-  { src: "/gallery/french-black-stars.jpg", alt: "Pink French tips with black star accents" },
-  { src: "/gallery/milky-pink-short.jpg", alt: "Short square nails in milky pink" },
-  { src: "/gallery/white-french-square.jpg", alt: "Square nails with crisp white French tips" },
-  { src: "/gallery/sheer-nude-almond.jpg", alt: "Short almond nails in sheer nude pink" },
-  heroPhoto,
-];

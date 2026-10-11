@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "db:push": "npx supabase db push --include-seed",
-    "db:types": "npx supabase gen types typescript --linked --schema public > src/lib/supabase/database.types.ts"
+    "db:types": "npx supabase gen types typescript --linked --schema public > src/lib/supabase/database.types.ts",
+    "test:db": "vitest run --config vitest.db.config.mts"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",
@@ -21,7 +22,8 @@
     "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

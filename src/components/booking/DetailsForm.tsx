@@ -1,10 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useActionState } from "react";
+import { createBooking, type DetailsFormState } from "@/app/book/actions";
 import { Button } from "@/components/Button";
-import { Field, TextArea, TextInput } from "@/components/Field";
+import { errorId, Field, TextArea, TextInput } from "@/components/Field";
 import { Heart } from "@/components/Heart";
 import { TextLink } from "@/components/TextLink";
+import { HONEYPOT } from "@/lib/honeypot";
 import { formatPounds } from "@/lib/money";
 
 type DetailsFormProps = {
@@ -14,30 +16,46 @@ type DetailsFormProps = {
   depositPounds: number;
 };
 
-/**
- * UI only: the browser checks the required fields, then opens the demo deposit
- * page. Step 5 adds the server action with Zod, the honeypot and createBooking.
- */
-export function DetailsForm({ serviceId, slotId, pricePounds, depositPounds }: DetailsFormProps) {
-  const router = useRouter();
+function fieldProps(name: keyof NonNullable<DetailsFormState["errors"]>, state: DetailsFormState) {
+  const error = state.errors?.[name];
+  return {
+    id: name,
+    name,
+    defaultValue: state.values?.[name],
+    "aria-invalid": error ? true : undefined,
+    "aria-describedby": error ? errorId(name) : undefined,
+  };
+}
 
-  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    // Only the service and slot go in the URL; never the client's details.
-    const params = new URLSearchParams({ service: serviceId, slot: slotId });
-    router.push(`/booking/demo-pending?${params}`);
-  }
+export function DetailsForm({ serviceId, slotId, pricePounds, depositPounds }: DetailsFormProps) {
+  const [state, formAction, pending] = useActionState(createBooking, {});
 
   return (
-    <form onSubmit={onSubmit} className="mt-6 grid gap-5">
-      <Field label="Full name" htmlFor="name">
-        <TextInput id="name" name="name" autoComplete="name" placeholder="Your name" required />
+    // key resets the inputs to the saved values after each failed submit.
+    <form action={formAction} key={JSON.stringify(state.values ?? {})} className="mt-6 grid gap-5" noValidate>
+      <input type="hidden" name="service" value={serviceId} />
+      <input type="hidden" name="slot" value={slotId} />
+
+      {/* Honeypot: hidden from people and screen readers; bots fill it in. */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+        <label htmlFor={HONEYPOT}>Leave this empty</label>
+        <input id={HONEYPOT} name={HONEYPOT} type="text" tabIndex={-1} autoComplete="off" />
+      </div>
+
+      {state.message && (
+        <p role="alert" className="rounded-card bg-warning-bg p-4 text-warning">
+          {state.message}
+        </p>
+      )}
+
+      <Field label="Full name" htmlFor="name" error={state.errors?.name}>
+        <TextInput {...fieldProps("name", state)} autoComplete="name" placeholder="Your name" required />
       </Field>
-      <Field label="Email" htmlFor="email">
-        <TextInput id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" required />
+      <Field label="Email" htmlFor="email" error={state.errors?.email}>
+        <TextInput {...fieldProps("email", state)} type="email" autoComplete="email" placeholder="you@example.com" required />
       </Field>
-      <Field label="Mobile" htmlFor="phone">
-        <TextInput id="phone" name="phone" type="tel" autoComplete="tel" placeholder="07…" required />
+      <Field label="Mobile" htmlFor="phone" error={state.errors?.phone}>
+        <TextInput {...fieldProps("phone", state)} type="tel" autoComplete="tel" placeholder="07…" required />
       </Field>
       <Field
         label={
@@ -46,24 +64,33 @@ export function DetailsForm({ serviceId, slotId, pricePounds, depositPounds }: D
           </>
         }
         htmlFor="notes"
+        error={state.errors?.notes}
       >
-        <TextArea id="notes" name="notes" placeholder="Inspo, allergies, removal needed…" rows={3} />
+        <TextArea {...fieldProps("notes", state)} placeholder="Inspo, allergies, removal needed…" rows={3} maxLength={500} />
       </Field>
 
-      <div className="flex items-start gap-3">
-        <input
-          id="policy"
-          name="policy"
-          type="checkbox"
-          required
-          className="mt-0.5 size-6 shrink-0 cursor-pointer rounded-md border-line accent-accent"
-        />
-        <label htmlFor="policy" className="cursor-pointer leading-relaxed">
-          I agree to the{" "}
-          <TextLink inline href="/terms#deposit" target="_blank">
-            deposit &amp; cancellation policy
-          </TextLink>
-        </label>
+      <div>
+        <div className="flex items-start gap-3">
+          <input
+            {...fieldProps("policy", state)}
+            defaultChecked={state.values?.policy === "on"}
+            defaultValue={undefined}
+            type="checkbox"
+            required
+            className="mt-0.5 size-6 shrink-0 cursor-pointer rounded-md border-line accent-accent"
+          />
+          <label htmlFor="policy" className="cursor-pointer leading-relaxed">
+            I agree to the{" "}
+            <TextLink inline href="/terms#deposit" target="_blank">
+              deposit &amp; cancellation policy
+            </TextLink>
+          </label>
+        </div>
+        {state.errors?.policy && (
+          <p id={errorId("policy")} className="mt-2 text-[14px] font-medium text-warning">
+            {state.errors.policy}
+          </p>
+        )}
       </div>
 
       <dl className="rounded-card border border-line p-5">
@@ -82,8 +109,14 @@ export function DetailsForm({ serviceId, slotId, pricePounds, depositPounds }: D
       </dl>
 
       <div className="mt-6">
-        <Button type="submit" className="w-full">
-          Book my slot <Heart />
+        <Button type="submit" className="w-full" disabled={pending}>
+          {pending ? (
+            "Booking…"
+          ) : (
+            <>
+              Book my slot <Heart />
+            </>
+          )}
         </Button>
         <p className="mt-3 text-center text-[13px] text-muted">
           Next: bank details for your {formatPounds(depositPounds)} deposit. No card needed.

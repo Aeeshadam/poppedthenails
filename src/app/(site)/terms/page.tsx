@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { depositPounds, settings } from "@/lib/dummy";
+import { connection } from "next/server";
+import { quotedDeposit } from "@/lib/booking-rules";
+import { getActiveServices } from "@/lib/data/services";
+import { getPublicSettings } from "@/lib/data/settings";
 import { formatPounds } from "@/lib/money";
 
 export const metadata: Metadata = { title: "Terms & conditions · poppedthenail" };
 
-export default function TermsPage() {
-  const deposit = formatPounds(depositPounds);
+export default async function TermsPage() {
+  await connection();
+  const [services, settings] = await Promise.all([getActiveServices(), getPublicSettings()]);
+  const deposit = formatPounds(quotedDeposit(services));
 
   return (
     <article className="mx-auto w-full max-w-reading px-6 pt-10">

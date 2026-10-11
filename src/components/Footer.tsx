@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { settings } from "@/lib/dummy";
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/content";
 import { Logo } from "./Logo";
 
 const links = [
@@ -27,10 +27,10 @@ export function Footer() {
           </ul>
         </nav>
         <a
-          href={`https://www.instagram.com/${settings.instagram_handle}`}
+          href={INSTAGRAM_URL}
           className="mt-4 inline-flex min-h-11 items-center text-[15px] text-lilac underline underline-offset-4 hover:text-white"
         >
-          Instagram @{settings.instagram_handle}
+          Instagram @{INSTAGRAM_HANDLE}
         </a>
         <p className="mt-2 text-[13px] text-white/60">© {year} poppedthenail</p>
       </div>

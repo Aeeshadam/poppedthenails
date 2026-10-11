@@ -1,17 +1,21 @@
 import type { ComponentProps, ReactNode } from "react";
 
 const inputClasses =
-  "w-full rounded-input border border-line bg-surface px-4 text-base text-ink placeholder:text-muted/70 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20";
+  "w-full rounded-input border border-line bg-surface px-4 text-base text-ink placeholder:text-muted/70 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 aria-invalid:border-warning";
 
 type FieldProps = {
   label: ReactNode;
   htmlFor: string;
   hint?: ReactNode;
+  /** Shown under the control. Give the control aria-describedby={errorId(htmlFor)} and aria-invalid. */
+  error?: string;
   className?: string;
   children: ReactNode;
 };
 
-export function Field({ label, htmlFor, hint, className = "", children }: FieldProps) {
+export const errorId = (htmlFor: string) => `${htmlFor}-error`;
+
+export function Field({ label, htmlFor, hint, error, className = "", children }: FieldProps) {
   return (
     <div className={className}>
       <label htmlFor={htmlFor} className="mb-2 block text-[15px] font-semibold">
@@ -19,6 +23,11 @@ export function Field({ label, htmlFor, hint, className = "", children }: FieldP
       </label>
       {children}
       {hint && <p className="mt-2 text-[13px] text-muted">{hint}</p>}
+      {error && (
+        <p id={errorId(htmlFor)} className="mt-2 text-[14px] font-medium text-warning">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

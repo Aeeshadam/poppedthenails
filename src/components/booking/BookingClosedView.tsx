@@ -1,5 +1,6 @@
 import { ButtonLink } from "@/components/Button";
 import { TextLink } from "@/components/TextLink";
+import { INSTAGRAM_URL } from "@/lib/content";
 import { formatDayShort, formatTime } from "@/lib/dates";
 import type { BookingStatus } from "@/lib/types";
 
@@ -10,7 +11,6 @@ type BookingClosedViewProps = {
   serviceName: string;
   startsAt: string;
   holdHours: number;
-  instagramUrl: string;
 };
 
 function copyFor(status: ClosedStatus, holdHours: number) {
@@ -29,7 +29,7 @@ function copyFor(status: ClosedStatus, holdHours: number) {
   }
 }
 
-export function BookingClosedView({ status, serviceName, startsAt, holdHours, instagramUrl }: BookingClosedViewProps) {
+export function BookingClosedView({ status, serviceName, startsAt, holdHours }: BookingClosedViewProps) {
   const { title, body } = copyFor(status, holdHours);
 
   return (
@@ -43,7 +43,7 @@ export function BookingClosedView({ status, serviceName, startsAt, holdHours, in
         Book again
       </ButtonLink>
       {status === "cancelled" && (
-        <TextLink href={instagramUrl} className="mt-3">
+        <TextLink href={INSTAGRAM_URL} className="mt-3">
           Message us on Instagram
         </TextLink>
       )}

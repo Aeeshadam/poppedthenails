@@ -88,7 +88,7 @@ yet; buttons may change what is on screen but nothing is saved.
    locked and labelled, a "copy this week to next week" button, and a summary of the
    week's slots.
 6. /admin/settings (no design; follow the other admin pages): bank details, address,
-   Instagram handle, about text, usual hours, deposit policy wording, hold hours,
+   about text, usual hours, deposit policy wording, hold hours,
    minimum notice.
 7. The desktop layout: admin pages centred in a column about 480px wide.
 

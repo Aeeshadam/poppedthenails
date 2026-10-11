@@ -1,12 +1,10 @@
-// Dummy slots and bookings, generated relative to "now" so the screens always
-// have something to show. Step 5 replaces this with Supabase.
+// Dummy slots and bookings for the admin screens, generated relative to "now",
+// until steps 6 and 7 read them from Supabase.
 
-import { addDays, addMinutes, londonDateKey, londonToUtc, msUntil, weekdayIndex, type DateKey } from "./dates";
+import { addDays, addMinutes, londonDateKey, londonToUtc, weekdayIndex, type DateKey } from "./dates";
 import { services, settings } from "./dummy";
 import { holdsSlot } from "./booking-rules";
 import type { Booking, Slot } from "./types";
-
-const HOUR = 60 * 60_000;
 
 /** Her usual pattern: weekday evenings, weekend daytimes, Wednesdays off. */
 function timesFor(dateKey: DateKey): string[] {
@@ -109,37 +107,4 @@ export function liveBookingsBySlot({ bookings }: DummyData): Map<string, Booking
     if (b.slot_id && holdsSlot(b.status)) live.set(b.slot_id, b);
   }
   return live;
-}
-
-/** Slots with no live booking that start after the minimum notice. */
-export function openSlots(data: DummyData, now: Date): Slot[] {
-  const taken = liveBookingsBySlot(data);
-  const notice = settings.min_notice_hours * HOUR;
-  return data.slots.filter((s) => !taken.has(s.id) && msUntil(s.starts_at, now) > notice);
-}
-
-type DemoChoice = { serviceId?: string; slotId?: string };
-
-/**
- * Finds a booking by its secret token. Demo only: a pending booking shows the
- * service and slot chosen in the booking flow, as a real new booking would.
- * Step 5 replaces this with a Supabase lookup by token.
- */
-export function findBookingByToken(data: DummyData, token: string, choice: DemoChoice = {}): Booking | undefined {
-  const booking = data.bookings.find((b) => b.token === token);
-  const service = services.find((s) => s.is_active && s.id === choice.serviceId);
-  const slot = data.slots.find((s) => s.id === choice.slotId);
-  if (!booking || booking.status !== "pending_deposit" || !service || !slot) return booking;
-
-  return {
-    ...booking,
-    service_id: service.id,
-    service_name: service.name,
-    duration_min: service.duration_min,
-    price_pounds: service.price_pounds,
-    deposit_pounds: service.deposit_pounds,
-    slot_id: slot.id,
-    starts_at: slot.starts_at,
-    client_says_paid_at: null,
-  };
 }

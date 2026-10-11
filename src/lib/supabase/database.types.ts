@@ -52,7 +52,7 @@ export type Database = {
           notes?: string | null
           paid_at?: string | null
           price_pounds: number
-          reference: string
+          reference?: string
           reminder_sent_at?: string | null
           service_id?: string | null
           service_name: string
@@ -148,7 +148,6 @@ export type Database = {
           hold_hours: number
           hours_note: string
           id: boolean
-          instagram_handle: string
           min_notice_hours: number
         }
         Insert: {
@@ -161,7 +160,6 @@ export type Database = {
           hold_hours?: number
           hours_note?: string
           id?: boolean
-          instagram_handle?: string
           min_notice_hours?: number
         }
         Update: {
@@ -174,7 +172,6 @@ export type Database = {
           hold_hours?: number
           hours_note?: string
           id?: boolean
-          instagram_handle?: string
           min_notice_hours?: number
         }
         Relationships: []

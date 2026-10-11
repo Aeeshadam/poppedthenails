@@ -19,13 +19,12 @@ where not exists (select 1 from services);
 -- The single settings row, with the same dummy values as the site.
 insert into settings (
   bank_account_name, bank_sort_code, bank_account_number,
-  deposit_policy, address, hours_note, instagram_handle, about_text
+  deposit_policy, address, hours_note, about_text
 ) values (
   '[Account name]', '[00-00-00]', '[00000000]',
   'Your £5 deposit secures your slot and comes off your total on the day. It is non-refundable if you cancel.',
   E'[Address line]\n[Town, Postcode]',
   'Weekday evenings from 5pm and weekends. Times vary, so check the booking calendar.',
-  'poppedthenail',
   '[A couple of lines about her — training, style, what clients love about coming in.]'
 )
 on conflict (id) do nothing;

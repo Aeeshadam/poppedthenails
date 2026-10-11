@@ -1,6 +1,7 @@
 import { BookingsBoard } from "@/components/admin/BookingsBoard";
 import type { BoardBooking } from "@/lib/admin-board";
-import { business, settings } from "@/lib/dummy";
+import { business } from "@/lib/content";
+import { settings } from "@/lib/dummy";
 import { buildDummyData } from "@/lib/dummy-bookings";
 import type { BookingStatus } from "@/lib/types";
 import { requestTime } from "@/lib/request-time";

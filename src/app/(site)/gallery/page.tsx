@@ -4,7 +4,7 @@ import { ButtonLink } from "@/components/Button";
 import { Heart } from "@/components/Heart";
 import { GRID_SHAPES } from "@/components/shapes";
 import { TextLink } from "@/components/TextLink";
-import { galleryPhotos, settings } from "@/lib/dummy";
+import { galleryPhotos, INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/content";
 
 export const metadata: Metadata = { title: "Gallery · poppedthenail" };
 
@@ -17,8 +17,8 @@ export default function GalleryPage() {
       <h1 className="font-serif text-title">Gallery</h1>
       <p className="mt-2 leading-relaxed text-muted">
         Recent sets from the studio. There&rsquo;s more on{" "}
-        <TextLink inline href={`https://www.instagram.com/${settings.instagram_handle}`}>
-          Instagram @{settings.instagram_handle}
+        <TextLink inline href={INSTAGRAM_URL}>
+          Instagram @{INSTAGRAM_HANDLE}
         </TextLink>
         .
       </p>

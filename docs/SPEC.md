@@ -57,7 +57,7 @@ Three things to know before building:
 | `/admin` | Bookings | Her | Waiting for deposit, today, upcoming. Mark as paid, cancel. |
 | `/admin/services` | Services | Her | Add, edit, show or hide |
 | `/admin/availability` | Availability | Her | Add and remove the dates and times she is free |
-| `/admin/settings` | Settings (no design yet; follow the other admin pages) | Her | Bank details, address, usual hours, Instagram, about text, deposit wording, hold hours, minimum notice |
+| `/admin/settings` | Settings (no design yet; follow the other admin pages) | Her | Bank details, address, usual hours, about text, deposit wording, hold hours, minimum notice |
 | `/terms` | Terms and conditions | Public | Deposit and cancellation policy, holding a slot, booking notice, on the day. Linked from "Good to know", the footer and the policy checkbox on step 3. |
 
 Server endpoints:
@@ -140,7 +140,9 @@ Four tables in Supabase Postgres. Money is stored in whole pounds as integers, a
 | `deposit_policy` | text | The wording shown before booking and in emails |
 | `address` | text | Two lines: street, then town and postcode. Home page, confirmed page and emails. Dummy value until launch. |
 | `hours_note` | text | Her usual hours in a sentence, shown under "Find us". Dummy value until launch. |
-| `instagram_handle`, `about_text` | text | Home page and emails. Dummy values until launch. |
+| `about_text` | text | Home page. Dummy value until launch. |
+
+The Instagram handle is fixed, so it is a constant in `src/lib/content.ts` rather than a setting.
 
 One database rule prevents double-booking even if two people submit at the same second. A slot can have only one live booking:
 
@@ -299,7 +301,7 @@ These can wait until just before launch, because the build uses dummy values.
 
 - [ ] Her real list of services, with length and price for each.
 - [ ] Her bank account name, sort code and account number.
-- [ ] Studio address, Instagram handle and a few lines about her.
+- [ ] Studio address, Instagram handle (set in `src/lib/content.ts`) and a few lines about her.
 - [ ] Photos. Ten photos are in `public/gallery/`; `hero-pink-red-almond.jpg` is the hero. Confirm they are her work and fine to publish.
 - [ ] Should she manage gallery photos from admin (a `gallery_photos` table and upload page), or is a fixed list updated by a developer enough?
 - [ ] Her usual hours for "Find us", and the rest of the terms (lateness, allergies, refunds if she cancels).
