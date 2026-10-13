@@ -1,4 +1,4 @@
-import type { DaySlot } from "./types";
+import type { DaySlot } from "@/lib/availability";
 
 type TimeGridProps = {
   times: string[];

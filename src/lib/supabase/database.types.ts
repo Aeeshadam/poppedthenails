@@ -110,7 +110,6 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
-          photo_path: string | null
           price_pounds: number
         }
         Insert: {
@@ -121,7 +120,6 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
-          photo_path?: string | null
           price_pounds: number
         }
         Update: {
@@ -132,7 +130,6 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
-          photo_path?: string | null
           price_pounds?: number
         }
         Relationships: []

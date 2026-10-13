@@ -12,7 +12,7 @@ A booking website for a one-person nail business. Clients pick a service and one
 
 - Next.js (App Router) with TypeScript, strict mode
 - Tailwind CSS, using the design tokens in the spec
-- Supabase: Postgres, Auth (email and password, admin only), Storage
+- Supabase: Postgres and Auth (email and password, admin only)
 - Resend with React Email
 - Hosted on Netlify; a scheduled function runs the sweep
 - Vitest for unit tests
@@ -53,7 +53,7 @@ Run type check, lint and tests before saying a step is finished.
 - There is no domain yet. Use `http://localhost:3000` and the Netlify address for `SITE_URL`.
 - Resend is in test mode, so emails only reach the account owner's address. Do not treat that as a bug.
 - Services, bank details, address and about text are dummy seed data.
-- The ten photos in `public/gallery/` are listed in `src/lib/dummy.ts`; `hero-pink-red-almond.jpg` is the home hero. Whether they are her work is still to be confirmed.
+- The ten photos in `public/gallery/` are listed in `src/lib/content.ts`; `hero-pink-red-almond.jpg` is the home hero. Whether they are her work is still to be confirmed.
 
 ## Working style
 

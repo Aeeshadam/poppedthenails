@@ -82,11 +82,10 @@ yet; buttons may change what is on screen but nothing is saved.
    whether the client says they've paid and the time left), "Today" and "Upcoming",
    with Mark as paid, Cancel, Completed and No-show buttons.
 4. /admin/services to match "docs/designs/Admin · Services.png": list, add and edit
-   forms, show/hide toggle, and a photo picker.
+   forms, and show/hide toggle.
 5. /admin/availability to match "docs/designs/Admin · Availability.png": a week strip,
    a grid of half-hour times from 08:00 to 21:00 plus a custom time field, booked slots
-   locked and labelled, a "copy this week to next week" button, and a summary of the
-   week's slots.
+   locked and labelled, and a summary of the week's slots.
 6. /admin/settings (no design; follow the other admin pages): bank details, address,
    about text, usual hours, deposit policy wording, hold hours,
    minimum notice.
@@ -177,10 +176,8 @@ Done when: you sign in with your email and password, mark your test booking as p
 Read CLAUDE.md and docs/SPEC.md.
 
 Wire the remaining admin screens from step 3 to Supabase:
-1. /admin/services: add, edit, show/hide, and photo upload to the Supabase Storage
-   "photos" bucket.
-2. /admin/availability: addSlots, removeSlot, "copy this week to next week". Booked
-   slots cannot be removed.
+1. /admin/services: add, edit and show/hide.
+2. /admin/availability: addSlots and removeSlot. Booked slots cannot be removed.
 3. /admin/settings saves the settings row.
 
 All times are entered and shown in Europe/London and stored in UTC. Add tests for

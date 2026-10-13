@@ -15,6 +15,16 @@ type FieldProps = {
 
 export const errorId = (htmlFor: string) => `${htmlFor}-error`;
 
+/** id, name and error wiring for a control whose name matches its Field's htmlFor. */
+export function controlProps(name: string, error: string | undefined) {
+  return {
+    id: name,
+    name,
+    "aria-invalid": error ? true : undefined,
+    "aria-describedby": error ? errorId(name) : undefined,
+  } as const;
+}
+
 export function Field({ label, htmlFor, hint, error, className = "", children }: FieldProps) {
   return (
     <div className={className}>

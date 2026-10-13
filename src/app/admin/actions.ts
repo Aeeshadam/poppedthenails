@@ -4,9 +4,13 @@ import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { isAdminEmail } from "@/lib/admin-email";
+import { firstErrors, serviceFormSchema, settingsFormSchema, type FieldErrors } from "@/lib/admin-forms";
 import type { AdminAction } from "@/lib/admin-board";
 import { requireAdmin } from "@/lib/auth";
 import { changeBookingStatus } from "@/lib/data/admin-bookings";
+import { createService, setServiceActive, updateService } from "@/lib/data/admin-services";
+import { saveSettings } from "@/lib/data/admin-settings";
+import { addSlots, removeOpenSlot } from "@/lib/data/admin-slots";
 import { createAuthClient } from "@/lib/supabase/auth";
 
 export type FormState = { message?: string; email?: string; done?: boolean };
@@ -85,4 +89,62 @@ export async function markCompleted(id: string): Promise<boolean> {
 
 export async function markNoShow(id: string): Promise<boolean> {
   return changeBooking(id, "no-show");
+}
+
+export type SaveState = {
+  errors?: FieldErrors;
+  values?: Record<string, string>;
+  /** What was saved, e.g. the service name, once it succeeds. */
+  saved?: string;
+};
+
+function formValues(formData: FormData): Record<string, string> {
+  const values: Record<string, string> = {};
+  for (const [key, value] of formData) if (typeof value === "string") values[key] = value;
+  return values;
+}
+
+/** Adds a service, or edits one when the form has an id. */
+export async function saveService(_previous: SaveState, formData: FormData): Promise<SaveState> {
+  await requireAdmin();
+  const values = formValues(formData);
+  const parsed = serviceFormSchema.safeParse(values);
+  if (!parsed.success) return { values, errors: firstErrors(parsed.error) };
+
+  if (values.id) await updateService(values.id, parsed.data);
+  else await createService(parsed.data);
+  refresh();
+  return { saved: parsed.data.name };
+}
+
+export async function showService(id: string, show: boolean): Promise<void> {
+  await requireAdmin();
+  await setServiceActive(id, show);
+  refresh();
+}
+
+export async function saveSettingsForm(_previous: SaveState, formData: FormData): Promise<SaveState> {
+  await requireAdmin();
+  const values = formValues(formData);
+  const parsed = settingsFormSchema.safeParse(values);
+  if (!parsed.success) return { values, errors: firstErrors(parsed.error) };
+
+  await saveSettings(parsed.data);
+  refresh();
+  return { saved: "Settings" };
+}
+
+/** Adds slots at these UTC start times; ones that already exist are skipped. */
+export async function addAvailability(startsAt: string[]): Promise<void> {
+  await requireAdmin();
+  await addSlots(startsAt.filter((s) => !Number.isNaN(Date.parse(s))));
+  refresh();
+}
+
+/** Removes an open slot. A slot a live booking holds is never removed. */
+export async function removeAvailability(startsAt: string): Promise<boolean> {
+  await requireAdmin();
+  const removed = await removeOpenSlot(startsAt);
+  refresh();
+  return removed;
 }

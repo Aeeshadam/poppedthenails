@@ -1,8 +1,8 @@
-import { requireAdmin } from "@/lib/auth";
 import { SettingsForm } from "@/components/admin/SettingsForm";
-import { settings } from "@/lib/dummy";
+import { requireAdmin } from "@/lib/auth";
+import { getSettings } from "@/lib/data/admin-settings";
 
 export default async function AdminSettingsPage() {
   await requireAdmin();
-  return <SettingsForm settings={settings} />;
+  return <SettingsForm settings={await getSettings()} />;
 }

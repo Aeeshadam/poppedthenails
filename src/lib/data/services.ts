@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase/client";
 import type { Service } from "@/lib/types";
 
 // Services only need the public key: Row Level Security returns active ones only.
-const COLUMNS = "id, name, description, duration_min, price_pounds, deposit_pounds, photo_path, is_active";
+const COLUMNS = "id, name, description, duration_min, price_pounds, deposit_pounds, is_active";
 
 export async function getActiveServices(): Promise<Service[]> {
   const { data, error } = await supabase.from("services").select(COLUMNS).eq("is_active", true).order("created_at");

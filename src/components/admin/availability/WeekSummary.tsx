@@ -2,7 +2,7 @@ import { Card } from "@/components/Card";
 import { EmptyState } from "@/components/EmptyState";
 import { SectionLabel } from "@/components/SectionLabel";
 import { formatDateKey, type DateKey } from "@/lib/dates";
-import type { DaySlot } from "./types";
+import type { DaySlot } from "@/lib/availability";
 
 type WeekSummaryProps = {
   days: DateKey[];
@@ -14,9 +14,9 @@ export function WeekSummary({ days, slotsOn }: WeekSummaryProps) {
 
   return (
     <>
-      <SectionLabel>Your slots this week</SectionLabel>
+      <SectionLabel>Your slots for these days</SectionLabel>
       {daysWithSlots.length === 0 ? (
-        <EmptyState>No slots this week yet.</EmptyState>
+        <EmptyState>No slots on these days yet.</EmptyState>
       ) : (
         <ul className="grid gap-3">
           {daysWithSlots.map((day) => (

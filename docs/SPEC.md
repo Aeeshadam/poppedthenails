@@ -32,7 +32,7 @@ One Next.js app holds the public site, the booking flow and the admin pages. Thr
 | Hosting | Netlify | Builds from GitHub, runs server code as functions, scheduled functions | Free plan: 300 credits a month, 15 per production deploy |
 | Database | Supabase Postgres | Services, slots, bookings, settings | Free tier |
 | Admin login | Supabase Auth, email and password | Her sign-in; "Forgot password?" sends a reset link | Free tier |
-| Photos | Supabase Storage, and `public/gallery/` for now | Service photos in Storage. Gallery photos are a fixed list in code for now (see open questions). | Free tier |
+| Photos | `public/gallery/` | Gallery photos are a fixed list in code (see open questions). Services have no photos (decided 11 October 2026: no page shows them). | Free |
 | Email | Resend + React Email | All client and admin emails | Free tier, check current limits |
 | Domain | Any registrar | Site address and the email sending address | About £10 a year |
 | Code | GitHub private repo | Source, deploy trigger | Free |
@@ -101,7 +101,6 @@ Four tables in Supabase Postgres. Money is stored in whole pounds as integers, a
 | `duration_min` | int | 15 to 240. Shown to clients; not used to work out slots. |
 | `price_pounds` | int | Whole pounds |
 | `deposit_pounds` | int, default 5 | Whole pounds |
-| `photo_path` | text, nullable | Path in Supabase Storage |
 | `is_active` | boolean, default true | The show or hide switch |
 | `created_at` | timestamptz, default now() | Services are listed in the order they were added |
 
@@ -182,7 +181,7 @@ The client's steps:
 
 How dates and times work. She adds each slot herself, and the site offers only those:
 
-1. **She adds slots.** On `/admin/availability` she picks a date and taps the start times she is free, such as 17:00 and 18:30. A "copy this week to next week" button repeats a pattern.
+1. **She adds slots.** On `/admin/availability` she picks a date and taps the start times she is free, such as 17:00 and 18:30.
 2. **Clients see open slots.** A slot is open if it has no booking with status `pending_deposit` or `confirmed`, and it starts more than 24 hours from now.
 3. **A booking takes one slot.** Any service can go in any slot. She spaces her slots to suit her longest service.
 4. **To be unavailable, she does nothing.** A day with no slots is not offered. She can delete any slot that has no live booking.
@@ -246,12 +245,11 @@ The browser can read only public content. Every write, and every read of client 
 Setup steps, in order:
 
 1. Create the Supabase project in a London or EU region. Run the SQL migrations for the tables, the one-booking-per-slot index and the security rules.
-2. Create a public Storage bucket called `photos`.
-3. In Supabase Auth, set the site URL and add `/auth/callback` on localhost and the Netlify address as redirect URLs, and turn off sign-ups. Create her user by hand with a password of at least 12 characters.
-4. Connect the GitHub repo to Netlify and add the environment variables.
-5. Add the scheduled function for `/api/cron/sweep`, every 15 minutes.
-6. Deploy, then run one test booking end to end on the Netlify address.
-7. At launch: buy the domain, add it to Netlify, add Resend's DNS records, and update `SITE_URL`, `EMAIL_FROM` and the Supabase redirect URL.
+2. In Supabase Auth, set the site URL and add `/auth/callback` on localhost and the Netlify address as redirect URLs, and turn off sign-ups. Create her user by hand with a password of at least 12 characters.
+3. Connect the GitHub repo to Netlify and add the environment variables.
+4. Add the scheduled function for `/api/cron/sweep`, every 15 minutes.
+5. Deploy, then run one test booking end to end on the Netlify address.
+6. At launch: buy the domain, add it to Netlify, add Resend's DNS records, and update `SITE_URL`, `EMAIL_FROM` and the Supabase redirect URL.
 
 Work on branches and use Netlify deploy previews. Merge to `main` only when a batch of changes is ready, because each production deploy costs 15 credits.
 
@@ -289,7 +287,7 @@ Every screen is built first with dummy data, then the database and logic go in b
 4. **Database.** The four tables, the one-booking-per-slot index, security rules, and dummy services and slots.
 5. **Booking on real data.** Home and step 1 read Supabase, open slots, `createBooking`, the real deposit and confirmed page.
 6. **Admin sign-in and bookings.** Email and password sign-in, real bookings, mark as paid, cancel, completed and no-show.
-7. **Admin services, availability and settings.** Saving services, photo upload, adding and removing slots, bank details.
+7. **Admin services, availability and settings.** Saving services, adding and removing slots, bank details.
 8. **Emails.** The seven templates, Resend, and the calendar file.
 9. **Sweep, polish and launch.** Expiry and reminders, titles and favicon, loading and error states, Netlify deploy, and a full test booking.
 
