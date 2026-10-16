@@ -40,7 +40,7 @@ export default async function TermsPage() {
         <p className="mt-2 leading-relaxed text-muted">
           Appointments can be booked up to {settings.min_notice_hours} hours before they start.
           Your booking is confirmed once the deposit has landed, and you&rsquo;ll get a
-          confirmation email and a reminder the day before.
+          confirmation email.
         </p>
       </section>
 

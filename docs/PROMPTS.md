@@ -193,11 +193,11 @@ Done when: a slot you add in admin appears on the public booking page, and a boo
 ```
 Read CLAUDE.md and the "Emails" section of docs/SPEC.md.
 
-Build the seven emails as React Email templates in the purple design with the logo,
+Build the six emails as React Email templates in the purple design with the logo,
 and a single sendEmail helper using Resend. Wire them into the TODO hooks from steps
 5 and 6: emails 1 and 2 on booking, 3 on "I've sent it", 4 on mark as paid (with an
-.ics calendar attachment), 6 on cancel. Emails 5 and 7 are wired in step 9, but build
-their templates now.
+.ics calendar attachment), 6 on cancel. Email 5 is wired in step 9, but build its
+template now.
 
 An email failure must never fail the booking: catch, log, and carry on.
 
@@ -218,14 +218,13 @@ Read CLAUDE.md and docs/SPEC.md.
 Build:
 1. /api/cron/sweep, protected by CRON_SECRET, as a Netlify scheduled function every
    15 minutes. It expires pending_deposit bookings past expires_at unless
-   client_says_paid_at is set (send email 5), and sends email 7 once for confirmed
-   bookings starting tomorrow.
+   client_says_paid_at is set (send email 5).
 2. Page titles, meta description, favicon from the logo, and a social share image.
 3. Loading, empty and error states on every page.
 4. A netlify.toml and anything else needed to deploy on Netlify.
 
-Write tests for the sweep: expiry after two hours, no expiry when the client says
-they paid, and the reminder sent only once.
+Write tests for the sweep: expiry after two hours, and no expiry when the client says
+they paid.
 
 Then give me a launch checklist: Netlify environment variables, Supabase redirect
 URLs, and what to change when the domain poppedthenail.co.uk is bought later.

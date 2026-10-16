@@ -30,7 +30,6 @@ export type Database = {
           paid_at: string | null
           price_pounds: number
           reference: string
-          reminder_sent_at: string | null
           service_id: string | null
           service_name: string
           slot_id: string | null
@@ -53,7 +52,6 @@ export type Database = {
           paid_at?: string | null
           price_pounds: number
           reference?: string
-          reminder_sent_at?: string | null
           service_id?: string | null
           service_name: string
           slot_id?: string | null
@@ -76,7 +74,6 @@ export type Database = {
           paid_at?: string | null
           price_pounds?: number
           reference?: string
-          reminder_sent_at?: string | null
           service_id?: string | null
           service_name?: string
           slot_id?: string | null

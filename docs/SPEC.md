@@ -41,7 +41,7 @@ Three things to know before building:
 
 - **Netlify credits:** deploy to production in batches. Her day-to-day changes live in the database and cost no deploys.
 - **Supabase free tier:** free projects can be paused after a period with no activity. The scheduled sweep queries the database regularly, which keeps it active. Check the current rule at setup.
-- **No domain during the build:** the site runs locally and on a free Netlify address. Resend can only send to the account owner's own email until a domain is verified, which is enough for testing all seven emails.
+- **No domain during the build:** the site runs locally and on a free Netlify address. Resend can only send to the account owner's own email until a domain is verified, which is enough for testing all six emails.
 
 ## Pages and routes
 
@@ -71,7 +71,7 @@ Server endpoints:
 | `clientSaysPaid(token)` | Server action | Sets a flag and emails her |
 | `markPaid(id)`, `cancelBooking(id)` | Server actions, admin only | Change status and email the client |
 | `addSlots(date, times)`, `removeSlot(id)` | Server actions, admin only | Manage her open slots |
-| `/api/cron/sweep` | Netlify scheduled function, every 15 minutes | Expires unpaid bookings and sends day-before reminders |
+| `/api/cron/sweep` | Netlify scheduled function, every 15 minutes | Expires unpaid bookings |
 
 The designs are mobile only. On desktop, centre the same layout in a column about 480px wide for the booking and admin pages, and widen the home page to two columns.
 
@@ -128,7 +128,7 @@ Four tables in Supabase Postgres. Money is stored in whole pounds as integers, a
 | `status` | text | `pending_deposit`, `confirmed`, `expired`, `cancelled`, `completed`, `no_show` |
 | `expires_at` | timestamptz | When an unpaid hold ends |
 | `client_says_paid_at` | timestamptz, nullable | Set by the "I've sent it" button |
-| `paid_at`, `cancelled_at`, `reminder_sent_at` | timestamptz, nullable | |
+| `paid_at`, `cancelled_at` | timestamptz, nullable | |
 | `created_at` | timestamptz, default now() | |
 
 **`settings`** (a single row)
@@ -196,7 +196,7 @@ Rules for holds and expiry:
 
 ## Emails
 
-Seven emails, all sent by the server through Resend.
+Six emails, all sent by the server through Resend. (A seventh, a day-before reminder, was dropped on 13 October 2026.)
 
 | # | Email | To | Sent when | Contains |
 | --- | --- | --- | --- | --- |
@@ -206,13 +206,11 @@ Seven emails, all sent by the server through Resend.
 | 4 | You're booked | Client | She marks it paid | Service, date and time, address, amount left to pay, calendar file (.ics), deposit policy |
 | 5 | Your slot was released | Client | Hold expires unpaid | Short note and a link to book again |
 | 6 | Booking cancelled | Client | She cancels | Short note, her contact |
-| 7 | See you tomorrow | Client | The day before, sent by the sweep | Time, address, "come with bare nails" |
 
 Build details:
 
 - Templates are React Email components in the purple design, with the logo at the top.
 - The sender is `EMAIL_FROM` and replies go to `ADMIN_EMAIL`.
-- The reminder is sent once per booking. `reminder_sent_at` stops duplicates.
 - If an email fails to send, the booking still succeeds. Log the error and show the details on screen.
 
 ## Security and access
@@ -288,8 +286,8 @@ Every screen is built first with dummy data, then the database and logic go in b
 5. **Booking on real data.** Home and step 1 read Supabase, open slots, `createBooking`, the real deposit and confirmed page.
 6. **Admin sign-in and bookings.** Email and password sign-in, real bookings, mark as paid, cancel, completed and no-show.
 7. **Admin services, availability and settings.** Saving services, adding and removing slots, bank details.
-8. **Emails.** The seven templates, Resend, and the calendar file.
-9. **Sweep, polish and launch.** Expiry and reminders, titles and favicon, loading and error states, Netlify deploy, and a full test booking.
+8. **Emails.** The six templates, Resend, and the calendar file.
+9. **Sweep, polish and launch.** Expiry, titles and favicon, loading and error states, Netlify deploy, and a full test booking.
 
 Test these hardest: two people booking the same slot at once, the 2-hour expiry, the 24-hour cut-off, and times shown correctly across the clock changes in March and October.
 

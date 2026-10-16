@@ -27,8 +27,7 @@ export function ConfirmedView({ booking, address }: ConfirmedViewProps) {
         <p className="mt-4 font-script text-[40px] leading-none text-accent">yay!</p>
         <h1 className="mt-2 font-serif text-title">You&rsquo;re booked!</h1>
         <p className="mt-3 leading-relaxed text-muted">
-          Your deposit has landed and your slot is confirmed. We&rsquo;ve emailed you the details,
-          and you&rsquo;ll get a reminder the day before.
+          Your deposit has landed and your slot is confirmed. We&rsquo;ve emailed you the details.
         </p>
       </div>
 
