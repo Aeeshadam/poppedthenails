@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { parseBookingForm, type BookingFormErrors } from "@/lib/booking-form";
 import { holdExpiresAt } from "@/lib/booking-rules";
 import { countBookingsSince, insertBooking, markClientSaysPaid } from "@/lib/data/bookings";
+import { sendBookingCreatedEmails, sendClientPaidEmail } from "@/lib/email/booking-emails";
 import { getActiveService } from "@/lib/data/services";
 import { getPublicSettings } from "@/lib/data/settings";
 import { findBookableSlot } from "@/lib/data/slots";
@@ -67,12 +68,11 @@ export async function createBooking(_previous: DetailsFormState, formData: FormD
   });
   if (!token) redirect(timeGone);
 
-  // TODO(step 8): send email 1 (send your deposit) to the client and email 2 (new booking) to her.
+  await sendBookingCreatedEmails(token);
   redirect(`/booking/${token}`);
 }
 
 export async function clientSaysPaid(token: string): Promise<void> {
-  await markClientSaysPaid(token, new Date());
-  // TODO(step 8): send email 3 (client says they've paid) to her.
+  if (await markClientSaysPaid(token, new Date())) await sendClientPaidEmail(token);
   refresh();
 }

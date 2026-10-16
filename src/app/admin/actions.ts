@@ -8,6 +8,7 @@ import { firstErrors, serviceFormSchema, settingsFormSchema, type FieldErrors } 
 import type { AdminAction } from "@/lib/admin-board";
 import { requireAdmin } from "@/lib/auth";
 import { changeBookingStatus } from "@/lib/data/admin-bookings";
+import { sendBookedEmail, sendCancelledEmail } from "@/lib/email/booking-emails";
 import { createService, setServiceActive, updateService } from "@/lib/data/admin-services";
 import { saveSettings } from "@/lib/data/admin-settings";
 import { addSlots, removeOpenSlot } from "@/lib/data/admin-slots";
@@ -73,13 +74,13 @@ async function changeBooking(id: string, action: AdminAction): Promise<boolean> 
 
 export async function markPaid(id: string): Promise<boolean> {
   const changed = await changeBooking(id, "mark-paid");
-  // TODO(step 8): if changed, send email 4 (you're booked, with the calendar file) to the client.
+  if (changed) await sendBookedEmail(id);
   return changed;
 }
 
 export async function cancelBooking(id: string): Promise<boolean> {
   const changed = await changeBooking(id, "cancel");
-  // TODO(step 8): if changed, send email 6 (booking cancelled) to the client.
+  if (changed) await sendCancelledEmail(id);
   return changed;
 }
 

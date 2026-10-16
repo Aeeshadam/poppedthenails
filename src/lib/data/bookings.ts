@@ -10,6 +10,13 @@ export async function getBookingByToken(token: string): Promise<Booking | null> 
   return data as Booking | null;
 }
 
+export async function getBookingById(id: string): Promise<Booking | null> {
+  if (!isUuid(id)) return null;
+  const { data, error } = await createServerClient().from("bookings").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return data as Booking | null;
+}
+
 export async function countBookingsSince(email: string, since: Date): Promise<number> {
   const { count, error } = await createServerClient()
     .from("bookings")
@@ -23,7 +30,7 @@ export async function countBookingsSince(email: string, since: Date): Promise<nu
 /** A new booking. The database fills in its id, token, reference (POP-1001…) and created_at. */
 export type NewBooking = Omit<
   Booking,
-  "id" | "token" | "reference" | "created_at" | "client_says_paid_at" | "paid_at" | "cancelled_at" | "reminder_sent_at"
+  "id" | "token" | "reference" | "created_at" | "client_says_paid_at" | "paid_at" | "cancelled_at"
 >;
 
 /**
@@ -38,14 +45,16 @@ export async function insertBooking(booking: NewBooking): Promise<string | null>
   throw error;
 }
 
-/** "I've sent it": only on an unpaid booking, and only once. */
-export async function markClientSaysPaid(token: string, now: Date): Promise<void> {
-  if (!isUuid(token)) return;
-  const { error } = await createServerClient()
+/** "I've sent it": only on an unpaid booking, and only once. Returns whether it changed. */
+export async function markClientSaysPaid(token: string, now: Date): Promise<boolean> {
+  if (!isUuid(token)) return false;
+  const { data, error } = await createServerClient()
     .from("bookings")
     .update({ client_says_paid_at: now.toISOString() })
     .eq("token", token)
     .eq("status", "pending_deposit")
-    .is("client_says_paid_at", null);
+    .is("client_says_paid_at", null)
+    .select("id");
   if (error) throw error;
+  return data.length === 1;
 }
