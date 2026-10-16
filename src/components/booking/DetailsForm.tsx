@@ -39,7 +39,7 @@ export function DetailsForm({ serviceId, slotId, pricePounds, depositPounds }: D
       {/* Honeypot: hidden from people and screen readers; bots fill it in. */}
       <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
         <label htmlFor={HONEYPOT}>Leave this empty</label>
-        <input id={HONEYPOT} name={HONEYPOT} type="text" tabIndex={-1} autoComplete="off" />
+        <input id={HONEYPOT} name={HONEYPOT} type="text" tabIndex={-1} autoComplete="off" data-1p-ignore data-lpignore="true" />
       </div>
 
       {state.message && (
