@@ -13,6 +13,7 @@ type TodayCardProps = {
   busy?: boolean;
   onCompleted: () => void;
   onNoShow: () => void;
+  onCancel: () => void;
 };
 
 function StatusBadge({ booking: b }: { booking: BoardBooking }) {
@@ -21,7 +22,8 @@ function StatusBadge({ booking: b }: { booking: BoardBooking }) {
   return <Badge tone="success">Paid {formatPounds(b.deposit_pounds)}</Badge>;
 }
 
-export function TodayCard({ booking: b, now, busy, onCompleted, onNoShow }: TodayCardProps) {
+export function TodayCard({ booking: b, now, busy, onCompleted, onNoShow, onCancel }: TodayCardProps) {
+  const finished = hasFinished(b, now);
   return (
     <li>
       <Card className="p-5">
@@ -40,7 +42,12 @@ export function TodayCard({ booking: b, now, busy, onCompleted, onNoShow }: Toda
           </div>
           <StatusBadge booking={b} />
         </div>
-        {b.status === "confirmed" && hasFinished(b, now) && (
+        {b.status === "confirmed" && !finished && (
+          <Button size="md" variant="secondary" className="mt-4 w-full" onClick={onCancel} disabled={busy}>
+            Cancel
+          </Button>
+        )}
+        {b.status === "confirmed" && finished && (
           <div className="mt-4 flex gap-3">
             <Button size="md" variant="secondary" className="flex-1" onClick={onCompleted} disabled={busy}>
               Completed

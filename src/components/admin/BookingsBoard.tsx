@@ -89,6 +89,7 @@ export function BookingsBoard({ bookings, ownerName, now: initialNow, holdHours 
               busy={busy}
               onCompleted={() => run(markCompleted, b, `${b.client_name} marked as completed.`)}
               onNoShow={() => run(markNoShow, b, `${b.client_name} marked as a no-show.`)}
+              onCancel={() => cancel(b)}
             />
           ))}
         </ul>
@@ -98,7 +99,7 @@ export function BookingsBoard({ bookings, ownerName, now: initialNow, holdHours 
       {upcoming.length === 0 ? (
         <EmptyState>No upcoming appointments yet.</EmptyState>
       ) : (
-        <UpcomingList bookings={upcoming} />
+        <UpcomingList bookings={upcoming} busy={busy} onCancel={cancel} />
       )}
 
       <p className="mt-10 text-[15px] leading-relaxed text-muted">
