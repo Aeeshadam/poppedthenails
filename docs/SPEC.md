@@ -32,7 +32,7 @@ One Next.js app holds the public site, the booking flow and the admin pages. Thr
 | Hosting | Netlify | Builds from GitHub, runs server code as functions, scheduled functions | Free plan: 300 credits a month, 15 per production deploy |
 | Database | Supabase Postgres | Services, slots, bookings, settings | Free tier |
 | Admin login | Supabase Auth, email and password | Her sign-in; "Forgot password?" sends a reset link | Free tier |
-| Photos | `public/gallery/` | Gallery photos are a fixed list in code (see open questions). Services have no photos (decided 11 October 2026: no page shows them). | Free |
+| Photos | Supabase Storage, public `gallery` bucket | She uploads gallery photos in `/admin/gallery` (decided 24 October 2026). Her browser shrinks each photo to a ~600px thumbnail and a ~1600px full size before upload. The home hero is a fixed file, `public/hero.jpg`. Services have no photos (decided 11 October 2026: no page shows them). | Free tier: 1 GB storage, 5 GB downloads a month |
 | Email | Resend + React Email | All client and admin emails | Free tier, check current limits |
 | Domain | Any registrar | Site address and the email sending address | About £10 a year |
 | Code | GitHub private repo | Source, deploy trigger | Free |
@@ -48,7 +48,7 @@ Three things to know before building:
 | Route | Page | Who | Notes |
 | --- | --- | --- | --- |
 | `/` | Home | Public | Hero, photo carousel, services, about, good to know, find us. Reads services and settings. |
-| `/gallery` | Gallery | Public | All gallery photos in a grid, a link to Instagram and a book button. Linked from the carousel and the footer. |
+| `/gallery` | Gallery | Public | All gallery photos in a grid, newest first, a link to Instagram and a book button. Tapping a photo opens it full screen. Linked from the carousel and the footer. |
 | `/book` | Step 1, choose service | Public | Active services only |
 | `/book/time?service=…` | Step 2, date and time | Public | Shows the days that have open slots, then the times on the chosen day |
 | `/book/details?service=…&slot=…` | Step 3, your details | Public | Name, email, mobile, notes, policy checkbox |
@@ -59,6 +59,7 @@ Three things to know before building:
 | `/admin` | Bookings | Her | Waiting for deposit, today, upcoming. Mark as paid, cancel. |
 | `/admin/services` | Services | Her | Add, edit, show or hide |
 | `/admin/availability` | Availability | Her | Add and remove the dates and times she is free |
+| `/admin/gallery` | Gallery | Her | Add photos (several at once, from her phone), give each an optional description, delete. Newest first; the first 10 are on the home page. |
 | `/admin/settings` | Settings (no design yet; follow the other admin pages) | Her | Bank details, address, usual hours, about text, deposit wording, hold hours, minimum notice |
 | `/terms` | Terms and conditions | Public | Deposit and cancellation policy, holding a slot, booking notice, on the day. Linked from "Good to know", the footer and the policy checkbox on step 3. |
 
@@ -79,10 +80,10 @@ Home page sections, top to bottom:
 
 - **Header:** logo and a "Book now" button.
 - **Hero:** the hero photo in an arched card, darkened towards the bottom, with "hey gorgeous", "Pretty nails, happy you." and a white "Book your slot" button on top. A one-line intro sits under the card.
-- **Photo carousel:** arched slides of the gallery photos. It moves on by itself every 4 seconds, loops back to the start after the last photo, and can be swiped. Swiping (or tapping an arrow on desktop) pauses it, and a Pause/Play button stops and restarts it (WCAG 2.2.2). It never moves by itself when the device asks for reduced motion. "Gallery →" links to `/gallery`.
+- **Photo carousel:** arched slides of the 10 newest gallery photos. Tapping one opens it full screen (swipe or arrows to move, Esc or Close to leave); hidden when there are no photos. It moves on by itself every 4 seconds, loops back to the start after the last photo, and can be swiped. Swiping (or tapping an arrow on desktop) pauses it, and a Pause/Play button stops and restarts it (WCAG 2.2.2). It never moves by itself when the device asks for reduced motion. "Gallery →" links to `/gallery`.
 - **Services:** the first four active services, and "See all services & book".
 - **About** and **Good to know** cards. Good to know links to `/terms`.
-- **Find us:** a drawn map preview (not a live map, so nothing loads from Google), the address on two lines, her usual hours, and "Get directions", which opens Google Maps.
+- **Find us:** no map; the address on two lines, her usual hours, and "Get directions", which opens Google Maps. On desktop it stays a narrow column on the left.
 - **Footer:** logo; links to Gallery, Book now and Terms & conditions; Instagram; copyright.
 
 On desktop (768px and wider) the home page sits in a 1024px column. The hero becomes two columns: the headline, intro and a purple "Book your slot" button on the left, and the arched photo on the right. The carousel shows four photos at a time and adds previous and next arrow buttons because there is no swipe.
@@ -144,6 +145,16 @@ Four tables in Supabase Postgres. Money is stored in whole pounds as integers, a
 | `about_text` | text | Home page. Dummy value until launch. |
 
 The Instagram handle is fixed, so it is a constant in `src/lib/content.ts` rather than a setting.
+
+### `gallery_photos`
+
+Server only (RLS on, no policies). Each photo's files are `{id}/thumb.jpg` and `{id}/full.jpg` in the public `gallery` bucket, which accepts JPEGs up to 3 MB and is written only with the service role key.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid | Also the folder name in the bucket |
+| `alt` | text, nullable, up to 200 characters | Her description. Blank means "Nail set by poppedthenail". |
+| `created_at` | timestamptz | Newest first everywhere |
 
 One database rule prevents double-booking even if two people submit at the same second. A slot can have only one live booking:
 
@@ -288,6 +299,7 @@ Every screen is built first with dummy data, then the database and logic go in b
 7. **Admin services, availability and settings.** Saving services, adding and removing slots, bank details.
 8. **Emails.** The six templates, Resend, and the calendar file.
 9. **Sweep, polish and launch.** Expiry, titles and favicon, Netlify deploy, and a full test booking.
+10. **Gallery from admin.** Upload and delete photos, tap-to-view, the 10 newest on the home page.
 
 Test these hardest: two people booking the same slot at once, the 2-hour expiry, the 24-hour cut-off, and times shown correctly across the clock changes in March and October.
 
@@ -300,8 +312,7 @@ These can wait until just before launch, because the build uses dummy values.
 - [ ] Her real list of services, with length and price for each.
 - [ ] Her bank account name, sort code and account number.
 - [ ] Studio address, Instagram handle (set in `src/lib/content.ts`) and a few lines about her.
-- [ ] Photos. Ten photos are in `public/gallery/`; `hero-pink-red-almond.jpg` is the hero. Confirm they are her work and fine to publish.
-- [ ] Should she manage gallery photos from admin (a `gallery_photos` table and upload page), or is a fixed list updated by a developer enough?
+- [ ] Photos. The ten starting gallery photos and `public/hero.jpg`: confirm they are her work and fine to publish.
 - [ ] Her usual hours for "Find us", and the rest of the terms (lateness, allergies, refunds if she cancels).
 - [ ] Her own email address for sign-in and notices.
 - [ ] Deposit rule: "no notice" is read here as the deposit being non-refundable whenever a client cancels. Confirm the wording.

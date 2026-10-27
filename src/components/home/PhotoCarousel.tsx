@@ -4,10 +4,10 @@ import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { IconButton } from "@/components/IconButton";
 import { ChevronLeft, ChevronRight } from "@/components/icons";
+import { PhotoViewer } from "@/components/PhotoViewer";
 import { ARCH } from "@/components/shapes";
 import { TextLink } from "@/components/TextLink";
-
-type Photo = { src: string; alt: string };
+import type { GalleryPhoto } from "@/lib/gallery";
 
 const INTERVAL_MS = 4000;
 /** Photos that can be on screen at first load (four on desktop) load straight away. */
@@ -42,11 +42,12 @@ function step(track: HTMLElement, direction: 1 | -1) {
  * Swiping or tapping an arrow pauses autoplay; Play restarts it. Autoplay
  * never runs when the device asks for reduced motion (WCAG 2.2.2).
  */
-export function PhotoCarousel({ photos }: { photos: Photo[] }) {
+export function PhotoCarousel({ photos }: { photos: GalleryPhoto[] }) {
   const trackRef = useRef<HTMLUListElement>(null);
   const [playing, setPlaying] = useState(true);
+  const [viewing, setViewing] = useState<number | null>(null);
   const reducedMotion = useReducedMotion();
-  const autoplay = playing && !reducedMotion;
+  const autoplay = playing && viewing === null && !reducedMotion;
 
   useEffect(() => {
     if (!autoplay) return;
@@ -69,20 +70,22 @@ export function PhotoCarousel({ photos }: { photos: Photo[] }) {
       >
         {photos.map((photo, i) => (
           <li
-            key={photo.src}
+            key={photo.id}
             role="group"
             aria-roledescription="slide"
             aria-label={`${i + 1} of ${photos.length}`}
             className={`relative aspect-[3/4] w-[64%] max-w-[300px] shrink-0 snap-start overflow-hidden ${ARCH} bg-lilac md:w-[calc(25%-12px)]`}
           >
-            <Image
-              src={photo.src}
-              alt={photo.alt}
-              fill
-              loading={i < EAGER_COUNT ? "eager" : undefined}
-              sizes="(min-width: 768px) 250px, 64vw"
-              className="object-cover"
-            />
+            <button type="button" onClick={() => setViewing(i)} className="absolute inset-0 focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-accent">
+              <Image
+                src={photo.thumbUrl}
+                alt={`View larger: ${photo.alt}`}
+                fill
+                unoptimized
+                loading={i < EAGER_COUNT ? "eager" : undefined}
+                className="object-cover"
+              />
+            </button>
           </li>
         ))}
       </ul>
@@ -117,6 +120,7 @@ export function PhotoCarousel({ photos }: { photos: Photo[] }) {
           Gallery →
         </TextLink>
       </div>
+      <PhotoViewer photos={photos} index={viewing} onChange={setViewing} />
     </section>
   );
 }

@@ -98,6 +98,24 @@ export type Database = {
           },
         ]
       }
+      gallery_photos: {
+        Row: {
+          alt: string | null
+          created_at: string
+          id: string
+        }
+        Insert: {
+          alt?: string | null
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          alt?: string | null
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           created_at: string

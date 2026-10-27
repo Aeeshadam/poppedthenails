@@ -7,8 +7,11 @@ import { isAdminEmail } from "@/lib/admin-email";
 import { firstErrors, serviceFormSchema, settingsFormSchema, type FieldErrors } from "@/lib/admin-forms";
 import type { AdminAction } from "@/lib/admin-board";
 import { requireAdmin } from "@/lib/auth";
+import { isUuid } from "@/lib/params";
 import { changeBookingStatus } from "@/lib/data/admin-bookings";
 import { sendBookedEmail, sendCancelledEmail } from "@/lib/email/booking-emails";
+import { addGalleryPhoto, deleteGalleryPhoto, updateGalleryAlt } from "@/lib/data/gallery";
+import { photoAltSchema, photoUploadSchema } from "@/lib/gallery";
 import { createService, setServiceActive, updateService } from "@/lib/data/admin-services";
 import { saveSettings } from "@/lib/data/admin-settings";
 import { addSlots, removeOpenSlot } from "@/lib/data/admin-slots";
@@ -148,4 +151,32 @@ export async function removeAvailability(startsAt: string): Promise<boolean> {
   const removed = await removeOpenSlot(startsAt);
   refresh();
   return removed;
+}
+
+/** Adds one photo, already resized in her browser. Returns an error message, or nothing when it worked. */
+export async function addPhoto(formData: FormData): Promise<string | undefined> {
+  await requireAdmin();
+  const parsed = photoUploadSchema.safeParse({
+    thumb: formData.get("thumb"),
+    full: formData.get("full"),
+    alt: formData.get("alt") ?? "",
+  });
+  if (!parsed.success) return parsed.error.issues[0]?.message;
+  await addGalleryPhoto(parsed.data);
+  refresh();
+}
+
+export async function savePhotoAlt(id: string, alt: string): Promise<string | undefined> {
+  await requireAdmin();
+  const parsed = photoAltSchema.safeParse({ id, alt });
+  if (!parsed.success) return parsed.error.issues[0]?.message;
+  await updateGalleryAlt(parsed.data.id, parsed.data.alt);
+  refresh();
+}
+
+export async function removePhoto(id: string): Promise<void> {
+  await requireAdmin();
+  if (!isUuid(id)) return;
+  await deleteGalleryPhoto(id);
+  refresh();
 }

@@ -233,6 +233,30 @@ Show me your plan first.
 
 Done when: the site runs on its Netlify address, and a full test booking works there from start to finish, including the emails.
 
+## Step 10 — Gallery from admin
+
+```
+Read CLAUDE.md and the gallery parts of docs/SPEC.md.
+
+She manages gallery photos herself, at no cost and with as little to think about as
+possible:
+1. A gallery_photos table and a public "gallery" bucket in Supabase Storage, written
+   only by the server.
+2. /admin/gallery: add several photos at once from her phone, an optional description
+   for each, delete. Her browser shrinks each photo to a thumbnail and a full size
+   before upload.
+3. The home carousel shows the 10 newest; /gallery shows all, newest first. Tapping any
+   photo opens it full screen, with swipe, arrows, Esc and Close.
+4. A one-off script that moves the photos in public/gallery/ into storage.
+
+Write tests for the upload rules (JPEG only, size limits) and, against the real
+database, adding and deleting a photo.
+
+Show me your plan first.
+```
+
+Done when: a photo she adds on her phone appears first on the home page, and opens full screen when tapped.
+
 ## After each step
 
 - Read the diff before committing.

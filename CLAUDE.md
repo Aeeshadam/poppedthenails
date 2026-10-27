@@ -6,13 +6,13 @@ A booking website for a one-person nail business. Clients pick a service and one
 
 - `docs/SPEC.md` is the source of truth for behaviour, data model, routes and emails. Follow it. If a request conflicts with it, say so and ask before changing course.
 - `docs/designs/` holds a screenshot of every screen. Match them closely: colours, fonts, spacing, wording.
-- `docs/PROMPTS.md` lists the nine build steps. Work on one step at a time and stop when it is done.
+- `docs/PROMPTS.md` lists the ten build steps. Work on one step at a time and stop when it is done.
 
 ## Stack
 
 - Next.js (App Router) with TypeScript, strict mode
 - Tailwind CSS, using the design tokens in the spec
-- Supabase: Postgres and Auth (email and password, admin only)
+- Supabase: Postgres, Auth (email and password, admin only) and Storage (gallery photos)
 - Resend with React Email
 - Hosted on Netlify; a scheduled function runs the sweep
 - Vitest for unit tests
@@ -53,7 +53,7 @@ Run type check, lint and tests before saying a step is finished.
 - There is no domain yet. Use `http://localhost:3000` and the Netlify address for `SITE_URL`.
 - Resend is in test mode, so emails only reach the account owner's address. Do not treat that as a bug.
 - Services, bank details, address and about text are dummy seed data.
-- The ten photos in `public/gallery/` are listed in `src/lib/content.ts`; `hero-pink-red-almond.jpg` is the home hero. Whether they are her work is still to be confirmed.
+- Gallery photos are uploaded in `/admin/gallery` and live in Supabase Storage; the home hero is `public/hero.jpg`. Whether the starting photos are her work is still to be confirmed.
 
 ## Working style
 

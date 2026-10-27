@@ -8,17 +8,23 @@ import { Services } from "@/components/home/Services";
 import { quotedDeposit } from "@/lib/booking-rules";
 import { getActiveServices } from "@/lib/data/services";
 import { getPublicSettings } from "@/lib/data/settings";
-import { business, galleryPhotos, heroPhoto } from "@/lib/content";
+import { business, heroPhoto } from "@/lib/content";
+import { getGalleryPhotos } from "@/lib/data/gallery";
+import { HOME_PHOTO_COUNT } from "@/lib/gallery";
 
 export default async function Home() {
   await connection();
-  const [services, settings] = await Promise.all([getActiveServices(), getPublicSettings()]);
+  const [services, settings, photos] = await Promise.all([
+    getActiveServices(),
+    getPublicSettings(),
+    getGalleryPhotos(HOME_PHOTO_COUNT),
+  ]);
   const deposit = quotedDeposit(services);
 
   return (
     <>
       <Hero depositPounds={deposit} photo={heroPhoto} />
-      <PhotoCarousel photos={galleryPhotos} />
+      {photos.length > 0 && <PhotoCarousel photos={photos} />}
 
       <div className="mx-auto w-full max-w-5xl px-6">
         <div className="grid gap-10 pt-12 md:grid-cols-2 md:gap-12">
