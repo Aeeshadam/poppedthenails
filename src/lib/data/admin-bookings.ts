@@ -55,3 +55,20 @@ export async function changeBookingStatus(id: string, action: AdminAction, now: 
   if (updateError) throw updateError;
   return updated.length === 1;
 }
+
+/**
+ * The sweep: expires unpaid bookings whose hold has ended, unless the client
+ * says they've paid. One update, so two sweeps at once can't expire (and
+ * email) the same booking twice. Returns what it expired.
+ */
+export async function expireOverdueBookings(now: Date) {
+  const { data, error } = await createServerClient()
+    .from("bookings")
+    .update({ status: "expired" })
+    .eq("status", "pending_deposit")
+    .lt("expires_at", now.toISOString())
+    .is("client_says_paid_at", null)
+    .select("reference, client_name, client_email, service_name, starts_at");
+  if (error) throw error;
+  return data;
+}

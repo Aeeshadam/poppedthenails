@@ -220,8 +220,7 @@ Build:
    15 minutes. It expires pending_deposit bookings past expires_at unless
    client_says_paid_at is set (send email 5).
 2. Page titles, meta description, favicon from the logo, and a social share image.
-3. Loading, empty and error states on every page.
-4. A netlify.toml and anything else needed to deploy on Netlify.
+3. A netlify.toml and anything else needed to deploy on Netlify.
 
 Write tests for the sweep: expiry after two hours, and no expiry when the client says
 they paid.

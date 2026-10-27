@@ -287,7 +287,7 @@ Every screen is built first with dummy data, then the database and logic go in b
 6. **Admin sign-in and bookings.** Email and password sign-in, real bookings, mark as paid, cancel, completed and no-show.
 7. **Admin services, availability and settings.** Saving services, adding and removing slots, bank details.
 8. **Emails.** The six templates, Resend, and the calendar file.
-9. **Sweep, polish and launch.** Expiry, titles and favicon, loading and error states, Netlify deploy, and a full test booking.
+9. **Sweep, polish and launch.** Expiry, titles and favicon, Netlify deploy, and a full test booking.
 
 Test these hardest: two people booking the same slot at once, the 2-hour expiry, the 24-hour cut-off, and times shown correctly across the clock changes in March and October.
 
